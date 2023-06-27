@@ -14,6 +14,8 @@ return new class extends Migration
         Schema::create('bobot_criteria', function (Blueprint $table) {
             $table->id();
             $table->bigInteger('criteria_id')->constrained();
+            $table->foreign('criteria_id')->references('id')->on('criterias')->restrictOnDelete()->cascadeOnUpdate();
+            $table->decimal('eigen_value');
             $table->decimal('bobot');
             $table->timestamps();
         });

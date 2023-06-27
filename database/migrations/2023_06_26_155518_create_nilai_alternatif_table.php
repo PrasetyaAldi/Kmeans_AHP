@@ -11,13 +11,13 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('nilai_alternatif', function (Blueprint $table) {
+        Schema::create('bobot_alternatif', function (Blueprint $table) {
             $table->id();
-            $table->bigInteger('data_id')->constrained();
-            $table->foreign('data_id')->references('id')->on('kmeans_normalized_data')->restrictOnDelete()->cascadeOnUpdate();
+            $table->bigInteger('normalize_id')->constrained();
+            $table->foreign('normalize_id')->references('id')->on('kmeans_normalized_data')->restrictOnDelete()->cascadeOnUpdate();
             $table->bigInteger('criteria_id')->constrained();
             $table->foreign('criteria_id')->references('id')->on('criterias')->restrictOnDelete()->cascadeOnUpdate();
-            $table->decimal('nilai');
+            $table->decimal('eigen_value');
             $table->timestamps();
         });
     }

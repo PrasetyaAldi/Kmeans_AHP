@@ -25,6 +25,20 @@ class KmeansData extends Model
         'motif',
     ];
 
+    protected $guarded = ['id'];
+    protected $casts = [
+        'jumlah_pekerja' => 'integer',
+        'jenis_produksi' => 'integer',
+        'kapasitas_produksi' => 'integer',
+        'harga_satuan' => 'integer',
+        'nilai_produksi' => 'integer',
+        'nilai_investasi' => 'integer',
+        'umur' => 'integer',
+        'pendidikan' => 'integer',
+        'surat_izin' => 'integer',
+        'motif' => 'integer',
+    ];
+
     /**
      * get the normalized data of the data
      */

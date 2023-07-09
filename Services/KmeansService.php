@@ -23,6 +23,35 @@ class KmeansService
         'surat_izin',
         'motif',
     ];
+
+    /**
+     * Menyimpan data
+     * 
+     * @param array $data
+     * 
+     */
+    public function saveKmeans(array $data)
+    {
+        $kmeans = new KmeansData();
+
+        $kmeans->fill($data);
+        $kmeans->save();
+
+        return $kmeans;
+    }
+
+    /**
+     * get list data
+     * 
+     * @param int $paginate
+     * 
+     * @return KmeansData
+     */
+    public function getListData(int $paginate = 10)
+    {
+        return KmeansData::orderBy('id')->paginate($paginate);
+    }
+
     /**
      * Normalization
      * 
@@ -47,11 +76,19 @@ class KmeansService
             }
             $dataNormalize[] = $data;
         }
-
         // insert into normalized data
         $normalize->insert($dataNormalize);
 
         return $dataNormalize;
+    }
+
+    /**
+     * reset cluster
+     * 
+     */
+    public function resetCluster()
+    {
+        return Centroid::truncate();
     }
 
     /**
@@ -122,6 +159,26 @@ class KmeansService
         }
 
         return $centroids;
+    }
+
+    /**
+     * get list kmeans data normalization
+     * 
+     */
+    public function getNormalization(): array
+    {
+        return Normalization::all()->toArray();
+    }
+
+    /**
+     * Mendapatkan list cluster
+     * 
+     * @param int $paginare
+     */
+    public function getCluster(int $paginate = 10)
+    {
+        $cluster = Centroid::selectRaw('cluster, COUNT(1) as jumlah ')->groupBy('cluster')->orderBy('cluster');
+        return $cluster->paginate($paginate);
     }
 
     /**

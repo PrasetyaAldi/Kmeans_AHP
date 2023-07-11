@@ -12,4 +12,9 @@ class Criteria extends Model
     protected $fillable = [
         'name',
     ];
+
+    public function weightCriteria()
+    {
+        return $this->hasOne(WeightCriteria::class, 'criteria_id', 'id');
+    }
 }

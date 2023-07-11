@@ -22,6 +22,22 @@
         .bg-grey-200 {
             background-color: #eef2f5;
         }
+
+        .card {
+            border: 1px solid #eef2f5;
+        }
+
+        .table th,
+        .table td {
+            width: 100px;
+            /* Ubah nilai lebar kolom sesuai kebutuhan */
+        }
+
+        input[type="number"]::-webkit-inner-spin-button,
+        input[type="number"]::-webkit-outer-spin-button {
+            -webkit-appearance: none;
+            margin: 0;
+        }
     </style>
 </head>
 

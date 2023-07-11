@@ -18,4 +18,9 @@ class WeightCriteria extends Model
         'created_at',
         'updated_at',
     ];
+
+    public function criteria()
+    {
+        return $this->belongsTo(Criteria::class, 'criteria_id', 'id');
+    }
 }

@@ -3,6 +3,7 @@
 namespace Services;
 
 use App\Models\Centroid;
+use App\Models\Criteria;
 use App\Models\WeightAlternatif;
 use App\Models\WeightCriteria;
 use Exception;
@@ -15,7 +16,7 @@ class AHPService
      * @param array $criteria
      * 
      */
-    public function getCriteriaWeight($criteria): array
+    public function getCriteriaWeight(array $criteria): array
     {
         // random index
         $randomIndex = [
@@ -46,7 +47,6 @@ class AHPService
         foreach ($criteria as $key => $value) {
             $row = [];
             foreach ($value['penilaian'] as $k => $v) {
-                $tests[] = ['v' => $v, 'sum' => $sum[$k], 'total' => $v / $sum[$k]];
                 $row[] = $v / $sum[$k];
             }
             $normalization[] = $row;
@@ -72,14 +72,10 @@ class AHPService
             $eigenValue[] = $weight * $sum[$key];
         }
 
-        // menyimpan ke table bobot_criteria
-        $this->saveCriteriaWeight($criteria, $weights, $eigenValue);
-
-        $eigenValue = array_sum($eigenValue);
         $ri = $randomIndex[count($criteria)];
 
         // menghitung nilai CI
-        $ci = ($eigenValue - count($criteria)) / (count($criteria) - 1);
+        $ci = (array_sum($eigenValue) - count($criteria)) / (count($criteria) - 1);
 
         // menghitung nilai CR
         $cr = $ci / $ri;
@@ -88,6 +84,9 @@ class AHPService
         if ($cr > 1) {
             throw new Exception('Nilai CR > 1');
         }
+
+        // menyimpan ke table bobot_criteria
+        $this->saveCriteriaWeight($criteria, $weights, $eigenValue);
 
         return ['consistency_index' => $ci, 'consistency_ratio' => $cr, 'weights' => $weights];
     }
@@ -182,5 +181,22 @@ class AHPService
                 'eigen_value' => $value['eigen_value'],
             ]);
         }
+    }
+
+    /**
+     * get All weight criteria
+     */
+    public function getAllWeightCriteria()
+    {
+        return WeightCriteria::with('criteria')->get();
+    }
+
+    /**
+     * pairwise comparison criteria
+     * 
+     */
+    public function pairwiseComparisonCriteria()
+    {
+        return Criteria::all();
     }
 }

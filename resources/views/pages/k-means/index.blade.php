@@ -11,7 +11,7 @@
 @endsection
 
 @section('content')
-    <div class="card shadow" style="border:0px">
+    <div class="card shadow">
         <div class="card-header">
             <div class="d-flex justify-content-between">
                 <h3 class="card-title">Data Batik</h3>

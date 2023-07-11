@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\AHPController;
 use App\Http\Controllers\KmeansController;
 use Illuminate\Support\Facades\Route;
 
@@ -20,3 +21,5 @@ Route::prefix('k-means')->as('k-means.')->group(function () {
 });
 Route::get('cluster', [KmeansController::class, 'cluster'])->name('cluster');
 Route::post('cluster', [KmeansController::class, 'processCluster'])->name('process');
+
+Route::resource('ahps', AHPController::class);

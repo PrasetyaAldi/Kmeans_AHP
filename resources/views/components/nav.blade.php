@@ -26,7 +26,7 @@
                         Rekomendasi
                     </a>
                     <ul class="dropdown-menu">
-                        <li><a class="dropdown-item" href="#">Bobot Kriteria</a></li>
+                        <li><a class="dropdown-item" href="{{ route('ahps.index') }}">Bobot Kriteria</a></li>
                         <li><a class="dropdown-item" href="#">Bobot Alternatif</a></li>
                     </ul>
                 </li>

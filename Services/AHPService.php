@@ -7,6 +7,8 @@ use App\Models\Criteria;
 use App\Models\WeightAlternatif;
 use App\Models\WeightCriteria;
 use Exception;
+use Illuminate\Database\Eloquent\Collection;
+use Illuminate\Pagination\LengthAwarePaginator;
 
 class AHPService
 {
@@ -113,6 +115,53 @@ class AHPService
     }
 
     /**
+     * Mendapatkan criteria
+     * 
+     * @return Collection
+     */
+    public function getCriteria(): Collection
+    {
+        return Criteria::all();
+    }
+
+    /**
+     * mendapatkan data alternatif berdasarkan cluster
+     * 
+     * @param string $cluster
+     * 
+     * @return Collection
+     */
+    public function getAlternatif(string $cluster = 'C1'): Collection
+    {
+        return Centroid::with('data')->where('cluster', $cluster)->get();
+    }
+
+    /**
+     * Reset weight criteria
+     * 
+     * 
+     */
+    public function resetWeightCriteria()
+    {
+        return WeightCriteria::truncate();
+    }
+
+    /**
+     * reset weight alternatif
+     * 
+     * @param int $criteriaId
+     * @param string $cluster
+     * 
+     * @return void
+     */
+    public function resetWeightAlternatif(int $criteriaId, string $cluster)
+    {
+        $centroids = Centroid::where('cluster', $cluster)->pluck('normalize_id')->toArray();
+
+        return WeightAlternatif::whereIn('normalize_id', $centroids)->where('criteria_id', $criteriaId)->delete();
+    }
+
+    /**
      * menghitung nilai bobot alternatif
      * 
      * @param array $alternatif
@@ -189,6 +238,65 @@ class AHPService
     public function getAllWeightCriteria()
     {
         return WeightCriteria::with('criteria')->get();
+    }
+
+    /**
+     * get All weight alternatif
+     */
+    public function getAllWeightAlternatif(int $criteriaId, string $cluster)
+    {
+        $centroids = Centroid::where('cluster', $cluster)->pluck('normalize_id')->toArray();
+
+        return WeightAlternatif::with(['data', 'criteria'])->where('criteria_id', $criteriaId)->whereIn('normalize_id', $centroids)->get();
+    }
+
+    /**
+     * menghitung nilai semua alternatif dan kriteria
+     * 
+     * @param string $cluster
+     * 
+     * @return object
+     */
+    public function finalResult(string $cluster)
+    {
+        $criteria = $this->getAllWeightCriteria();
+        $centroids = Centroid::where('cluster', $cluster)->pluck('normalize_id')->toArray();
+        $alternatif = WeightAlternatif::whereIn('normalize_id', $centroids)->get();
+
+        // hanya jika alternatif null
+        if ($alternatif->isEmpty()) {
+            return [];
+        }
+
+        // menghitung nilai akhir
+        $result = [];
+        foreach ($centroids as $centroid) {
+            $row = [];
+            foreach ($criteria as $c) {
+                $row[] = $alternatif->where('normalize_id', $centroid)->where('criteria_id', $c->criteria_id)->first()->eigen_value * $c->bobot;
+            }
+            $result[] = $row;
+        }
+
+        $finalResult = [];
+        foreach ($result as $key => $value) {
+            $finalResult[] = array_sum($value);
+        }
+
+        // sorting
+        usort($finalResult, function ($a, $b) {
+            return $a <=> $b;
+        });
+
+        // menghitung peringkat alternatif
+        $rank = [];
+        foreach ($finalResult as $key => $value) {
+            // tambahkan peringkat
+            $rank[] = ['id' => $centroids[$key], 'rank' => $value, 'nama' => Centroid::find($centroids[$key])->data->nama_pemilik, 'ranked' => $key + 1];
+        }
+
+        // return
+        return $rank;
     }
 
     /**

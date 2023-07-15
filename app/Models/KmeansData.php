@@ -46,4 +46,20 @@ class KmeansData extends Model
     {
         return $this->hasOne(Normalization::class);
     }
+
+    /**
+     * get the centroid of the data
+     */
+    public function centroid(): \Illuminate\Database\Eloquent\Relations\HasOne
+    {
+        return $this->hasOne(Centroid::class);
+    }
+
+    /**
+     * get the cluster of the data
+     */
+    public function cluster(): \Illuminate\Database\Eloquent\Relations\HasOne
+    {
+        return $this->hasOne(Cluster::class);
+    }
 }

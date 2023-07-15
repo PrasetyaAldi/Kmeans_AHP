@@ -15,7 +15,13 @@
         <div class="card-header">
             <div class="d-flex justify-content-between">
                 <h3 class="card-title">Bobot Kriteria</h3>
-                <button class="btn btn-primary"><i class="fa-solid fa-gear"></i> Hitung Ulang</button>
+                @if (!empty($weight_criteria->toArray()))
+                    <form action="{{ route('ahps.reset') }}" method="POST">
+                        @csrf
+                        <button class="btn btn-warning" style="background-color: var(--bs-warning-bg-subtle)"
+                            type="submit"><i class="fa-solid fa-gear"></i> Hitung Ulang</button>
+                    </form>
+                @endif
             </div>
         </div>
         <div class="card-body">
@@ -42,45 +48,48 @@
                     </tbody>
                 </table>
             @else
-                <table class="table">
-                    <thead>
-                        <tr>
-                            <th></th>
-                            @foreach ($data as $item)
-                                <th>{{ $item->name }}</th>
-                            @endforeach
-                        </tr>
-                    </thead>
-                    <tbody>
-                        <form action="{{ route('ahps.store') }}" method="POST" id="weightCriteriaForm">
-                            @csrf
-                            @foreach ($data as $key1 => $item)
-                                <tr>
-                                    <td>
-                                        {{ $item->name }}
-                                    </td>
-                                    @foreach ($data as $key2 => $item2)
+                <div style="width:100%;overflow-x:scroll">
+                    <table class="table">
+                        <thead>
+                            <tr>
+                                <th></th>
+                                @foreach ($data as $item)
+                                    <th>{{ $item->name }}</th>
+                                @endforeach
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <form action="{{ route('ahps.store') }}" method="POST" id="weightCriteriaForm">
+                                @csrf
+                                @foreach ($data as $key1 => $item)
+                                    <tr>
                                         <td>
-                                            @if ($key1 == $key2)
-                                                <input type="number" class="form-control"
-                                                    name="data[{{ $key1 }}][{{ $key2 }}]"
-                                                    id="data[{{ $key1 }}][{{ $key2 }}]"
-                                                    value="{{ old('data[' . $key1 . '][' . $key2 . ']') ?? 1 }}"
-                                                    min="1" max="9" readonly style="background-color: gray">
-                                            @else
-                                                <input type="number" class="form-control"
-                                                    name="data[{{ $key1 }}][{{ $key2 }}]"
-                                                    id="data[{{ $key1 }}][{{ $key2 }}]"
-                                                    value="{{ old('data[' . $key1 . '][' . $key2 . ']') ?? 1 }}"
-                                                    min="1" max="9">
-                                            @endif
+                                            {{ $item->name }}
                                         </td>
-                                    @endforeach
-                                </tr>
-                            @endforeach
-                        </form>
-                    </tbody>
-                </table>
+                                        @foreach ($data as $key2 => $item2)
+                                            <td>
+                                                @if ($key1 == $key2)
+                                                    <input type="number" class="form-control"
+                                                        name="data[{{ $key1 }}][{{ $key2 }}]"
+                                                        id="data[{{ $key1 }}][{{ $key2 }}]"
+                                                        value="{{ old('data[' . $key1 . '][' . $key2 . ']') ?? 1 }}"
+                                                        min="1" max="9" readonly
+                                                        style="background-color: gray">
+                                                @else
+                                                    <input type="number" class="form-control"
+                                                        name="data[{{ $key1 }}][{{ $key2 }}]"
+                                                        id="data[{{ $key1 }}][{{ $key2 }}]"
+                                                        value="{{ old('data[' . $key1 . '][' . $key2 . ']') ?? 1 }}"
+                                                        min="1" max="9">
+                                                @endif
+                                            </td>
+                                        @endforeach
+                                    </tr>
+                                @endforeach
+                            </form>
+                        </tbody>
+                    </table>
+                </div>
             @endif
         </div>
         @if (empty($weight_criteria->toArray()))
@@ -101,9 +110,8 @@
                 item.addEventListener('change', function() {
                     const id = this.id.split(/[\[\]]/).filter(Boolean)
                     const value = this.value
-                    console.log(id, value)
                     if (value > 9 || value < 1) {
-                        alert('Nilai Maksimal 9 dan Minimal 1')
+                        alert('Nilai Maksimal 9 dan Minimal 0.0')
                         this.value = 1
                         value = 1
                     }

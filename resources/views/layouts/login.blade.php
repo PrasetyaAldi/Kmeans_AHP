@@ -13,7 +13,7 @@
         rel="stylesheet">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet"
         integrity="sha384-9ndCyUaIbzAi2FUVXJi0CjmCapSmO7SnpJef0486qhLnuZ2cdeRhO02iuK6FUUVM" crossorigin="anonymous">
-    <title>{{ config('app.name') }} | @yield('title')</title>
+    <title>{{ config('app.name') }} | Login</title>
     <style>
         body {
             background-color: #f4f8fb;
@@ -84,26 +84,45 @@
 </head>
 
 <body>
-    <x-nav />
-    <div class="container mt-4">
-        @if (Session::get('error'))
-            <div class="alert alert-danger alert-dismissible" role="alert">
-                <i class="fa-solid fa-triangle-exclamation"></i> &nbsp; {{ Session::get('error') }}
-                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+    <div class="container">
+        <div class="row justify-content-center align-items-center" style="height:80vh">
+            <div class="col-md-5 col-12">
+                @if (Session::get('error'))
+                    <div class="alert alert-danger alert-dismissible" role="alert">
+                        <i class="fa-solid fa-triangle-exclamation"></i> &nbsp; {{ Session::get('error') }}
+                        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                    </div>
+                @elseif(Session::get('success'))
+                    <div class="alert alert-success alert-dismissible" role="alert">
+                        <i class="fa-solid fa-triangle-exclamation"></i> &nbsp; {{ Session::get('success') }}
+                        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                    </div>
+                @endif
+                <div class="card">
+                    <div class="card-body">
+                        <h4 class="text-center">Login</h4>
+                        <hr>
+                        <form action="{{ route('login.post') }}" method="post">
+                            @csrf
+                            <div class="mb-3">
+                                <label for="username">Username</label>
+                                <input type="text" name="username" id="username" class="form-control">
+                            </div>
+                            <div class="mb-3">
+                                <label for="password">Password</label>
+                                <input type="password" name="password" id="password" class="form-control">
+                            </div>
+                            <div class="d-flex justify-content-between">
+                                <button class="btn btn-primary" type="submit">Login</button>
+                                <a href="{{ route('home.index') }}">Masuk sebagai tamu</a>
+                            </div>
+                        </form>
+                    </div>
+                </div>
             </div>
-        @elseif(Session::get('success'))
-            <div class="alert alert-success alert-dismissible" role="alert">
-                <i class="fa-solid fa-triangle-exclamation"></i> &nbsp; {{ Session::get('success') }}
-                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-            </div>
-        @endif
-        <main>
-            <div class="container">
-                @yield('content')
-            </div>
-        </main>
-        @yield('modal')
+        </div>
     </div>
+
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"
         integrity="sha384-geWF76RCwLtnZ8qwWowPQNguL3RmwHVBC9FhGdlKrxdiJJigb/j/68SIy3Te4Bkz" crossorigin="anonymous">
     </script>

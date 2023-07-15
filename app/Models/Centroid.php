@@ -23,4 +23,13 @@ class Centroid extends Model
     {
         return $this->belongsTo(Normalization::class);
     }
+
+    /**
+     * get the data that owns the centroid
+     *
+     */
+    public function data(): \Illuminate\Database\Eloquent\Relations\BelongsTo
+    {
+        return $this->belongsTo(KmeansData::class, 'normalize_id', 'id');
+    }
 }

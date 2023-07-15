@@ -17,4 +17,12 @@ class Criteria extends Model
     {
         return $this->hasOne(WeightCriteria::class, 'criteria_id', 'id');
     }
+
+    /**
+     * Get all of the weightAlternatifs for the Criteria
+     */
+    public function weightAlternatifs(): \Illuminate\Database\Eloquent\Relations\HasMany
+    {
+        return $this->hasMany(WeightAlternatif::class, 'criteria_id', 'id');
+    }
 }

@@ -47,9 +47,12 @@ class KmeansService
      * 
      * @return KmeansData
      */
-    public function getListData(int $paginate = 10)
+    public function getListData(int $paginate = 10, bool $isCount = false)
     {
-        return KmeansData::orderBy('id')->paginate($paginate);
+        if (!$isCount) {
+            return KmeansData::orderBy('id')->paginate($paginate);
+        }
+        return KmeansData::count();
     }
 
     /**
@@ -99,7 +102,7 @@ class KmeansService
     public function getInitialCentroid()
     {
         $normalize = new Normalization();
-        $normalize = $normalize->whereIn('data_id', [4, 8, 13])->get();
+        $normalize = $normalize->whereIn('data_id', [8, 4, 13])->get(); // sementara
         // $normalize = $normalize->inRandomOrder()->take(3)->get();
 
         $centroid = [];
@@ -273,5 +276,14 @@ class KmeansService
         $min = $kMeans->min($column);
 
         return ($value - $min) / ($max - $min);
+    }
+
+    /**
+     * Mendapatkan nama cluster
+     * 
+     */
+    public function getClusterName()
+    {
+        return Centroid::selectRaw('cluster, COUNT(1) as jumlah ')->groupBy('cluster')->orderBy('cluster')->get();
     }
 }

@@ -4,7 +4,7 @@
 
 @section('content')
     <div class="card" style="border: 1px solid #eef2f5">
-        <div class="card-header bg-white">
+        <div class="card-header">
             <div class="d-flex justify-content-between">
                 <h3 class="card-title">Cluster</h3>
                 @if (!empty($data->items()))

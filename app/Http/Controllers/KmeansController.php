@@ -100,6 +100,8 @@ class KmeansController extends Controller
 
         $excel = Excel::toArray(new KmeansImport, $data);
 
+        $kmeansService->checkData();
+
         // looping sebanyak data excel
         foreach ($excel[0] as $key => $value) {
             $kmeansService->saveKmeans($value);
@@ -108,7 +110,7 @@ class KmeansController extends Controller
         // normalization data
         $kmeansService->normalizationData();
 
-        return redirect(route('k-means.index'));
+        return redirect(route('k-means.index'))->with('success', 'Import Data Berhasil');
     }
 
     /**

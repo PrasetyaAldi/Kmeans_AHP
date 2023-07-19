@@ -21,6 +21,11 @@ class LoginController extends Controller
      */
     public function login(Request $request, LoginService $loginService)
     {
+        // hanya jika username dan password kosong
+        if (!$request->username || !$request->password) {
+            return back()->with('error', 'Username dan Password tidak boleh kosong');
+        }
+
         $data = $request->except('_token');
         try {
             $user = $loginService->login($data);

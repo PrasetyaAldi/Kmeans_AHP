@@ -47,14 +47,18 @@
                     @if (!empty($data->items()))
                         <tr>
                             <th>Total</th>
-                            <td>{{ array_reduce(
+                            <th>{{ array_reduce(
                                 $data->items(),
                                 function ($carry, $item) {
                                     return $carry + $item->jumlah;
                                 },
                                 0,
                             ) }}
-                            </td>
+                            </th>
+                        </tr>
+                        <tr>
+                            <th>Nilai SSE</th>
+                            <th>{{ $data->first()->nilai_sse }}</th>
                         </tr>
                     @endif
                 </tbody>

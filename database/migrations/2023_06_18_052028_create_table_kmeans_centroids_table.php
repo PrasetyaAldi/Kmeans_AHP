@@ -16,6 +16,7 @@ return new class extends Migration
             $table->unsignedBigInteger('normalize_id');
             $table->foreign('normalize_id')->references('id')->on('kmeans_normalized_data')->cascadeOnUpdate()->restrictOnDelete();
             $table->string('cluster');
+            $table->decimal('nilai_sse');
             $table->timestamps();
         });
     }

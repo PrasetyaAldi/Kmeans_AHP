@@ -5,6 +5,7 @@ namespace Services;
 use App\Models\Centroid;
 use App\Models\KmeansData;
 use App\Models\Normalization;
+use App\Models\WeightAlternatif;
 
 /**
  * Service for k-means
@@ -99,18 +100,20 @@ class KmeansService
      * 
      * 
      */
-    public function getInitialCentroid()
+    public function getInitialCentroid(int $cluster = 3)
     {
         $normalize = new Normalization();
-        $normalize = $normalize->whereIn('data_id', [8, 4, 13])->get(); // sementara
-        // $normalize = $normalize->inRandomOrder()->take(3)->get();
+        $banyakData = $normalize->all()->count();
 
-        $centroid = [];
+        $normalize = $normalize->whereIn('data_id', [8, 4, 13])->get(); // sementara
+        // $normalize = $normalize->inRandomOrder()->take($cluster)->get();
+
+        $centroids = [];
         foreach ($normalize as $index => $data) {
-            $centroid[] = $data->getAttributes();
+            $centroids[] = $data->getAttributes();
         }
 
-        return $centroid;
+        return $centroids;
     }
 
     /**
@@ -156,8 +159,6 @@ class KmeansService
             foreach ($centroid as $key => $value) {
                 $centroid[$key] = $value / count($cluster['data']);
             }
-
-
             $centroids[] = $centroid;
         }
 
@@ -180,7 +181,7 @@ class KmeansService
      */
     public function getCluster(int $paginate = 10)
     {
-        $cluster = Centroid::selectRaw('cluster, COUNT(1) as jumlah ')->groupBy('cluster')->orderBy('cluster');
+        $cluster = Centroid::selectRaw('cluster, COUNT(1) as jumlah, nilai_sse')->groupBy('cluster', 'nilai_sse')->orderBy('cluster');
         return $cluster->paginate($paginate);
     }
 
@@ -192,6 +193,7 @@ class KmeansService
     {
         $iterations = 0;
         $clusters = [];
+        $sumSSE = [];
 
         while ($iterations < $maxIterations) {
             $clusters = [];
@@ -209,6 +211,7 @@ class KmeansService
                         $closestCentroid = $index;
                     }
                 }
+                $sumSSE[$iterations][] = $minDistance;
                 $clusters[$closestCentroid]['data'][] = $item;
             }
 
@@ -222,8 +225,7 @@ class KmeansService
             $iterations++;
         }
 
-        $sse = $this->calculateSSE($clusters, $centroids);
-
+        $sse = $this->calculateSSE($sumSSE);
 
         // menyimpan ke database
         $centroidModel = new Centroid();
@@ -232,32 +234,28 @@ class KmeansService
                 $centroidModel->create([
                     'normalize_id' => $item['id'],
                     'cluster' => 'C' . $key + 1,
+                    'nilai_sse' => $sse
                 ]);
             }
         }
 
-        return ['clusters' => $clusters, 'sse' => $sse];
+        return ['clusters' => $clusters];
     }
 
     /**
      * calculate SSE
      * 
-     * @param array $clusters
-     * @param array $centroids
+     * @param array $data
      * 
      */
-    public function calculateSSE(array $clusters, array $centroids)
+    public function calculateSSE(array $data)
     {
-        $sse = 0;
-        $columnToNormalize = $this->columnToNormalize;
-        foreach ($clusters as $key => $value) {
-            foreach ($value['data'] as $item) {
-                $item = array_intersect_key($item, array_flip($columnToNormalize));
-                $sse += pow($this->calculateDistance($centroids[$key], $item), 2);
-            }
+        $sumSSE = [];
+        foreach ($data as $key => $value) {
+            $sumSSE[$key] = array_sum($value);
         }
-
-        return $sse;
+        $minSSE = min($sumSSE);
+        return $minSSE;
     }
 
     /**
@@ -285,5 +283,22 @@ class KmeansService
     public function getClusterName()
     {
         return Centroid::selectRaw('cluster, COUNT(1) as jumlah ')->groupBy('cluster')->orderBy('cluster')->get();
+    }
+
+    /**
+     * Check data
+     * 
+     * 
+     */
+    public function checkData(): void
+    {
+        $data = KmeansData::all();
+        // hanya jika data tidak kosong
+        if ($data->count() > 0) {
+            KmeansData::truncate();
+            Centroid::truncate();
+            Normalization::truncate();
+            WeightAlternatif::truncate();
+        }
     }
 }

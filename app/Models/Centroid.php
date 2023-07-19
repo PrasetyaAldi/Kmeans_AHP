@@ -14,6 +14,7 @@ class Centroid extends Model
     protected $fillable = [
         'normalize_id',
         'cluster',
+        'nilai_sse'
     ];
 
     /**

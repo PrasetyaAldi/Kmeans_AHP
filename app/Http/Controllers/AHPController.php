@@ -61,7 +61,6 @@ class AHPController extends Controller
      */
     public function weightAlternatif(Request $request, AHPService $ahpService)
     {
-        // dd($request->all());
         $criteria = $request->criteria ?? '1';
         $cluster = $request->cluster ?? 'C1';
         $kMeansService = new KmeansService;

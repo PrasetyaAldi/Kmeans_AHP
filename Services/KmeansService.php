@@ -123,15 +123,16 @@ class KmeansService
      */
     public function calculateDistance($centroid, $data)
     {
+        // calculate distance with manhattan
+        $distance = 0;
         $columnToNormalize = $this->columnToNormalize;
-
-        $sum = 0;
-        foreach ($data as $key => $value) {
+        foreach ($centroid as $key => $value) {
             if (in_array($key, $columnToNormalize)) {
-                $sum += pow($value - $centroid[$key], 2);
+                $distance += abs($value - $data[$key]);
             }
         }
-        return sqrt($sum);
+
+        return $distance;
     }
 
     /**
@@ -226,7 +227,7 @@ class KmeansService
             $centroids = $this->updateCentroids($clusters);
 
             // hanya jika centroid tidak berubah
-            if ($oldCentroids === $centroids) {
+            if ($oldCentroids === $centroids && $iterations = 15) {
                 break;
             }
             $iterations++;

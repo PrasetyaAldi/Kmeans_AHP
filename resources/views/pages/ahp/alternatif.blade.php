@@ -199,6 +199,15 @@
             })
         })
 
+        const cluster = new URLSearchParams(window.location.search).get('cluster');
+
+        // Tambahkan parameter 'cluster' pada URL saat tombol pagination di-klik
+        document.querySelectorAll('.pagination a').forEach(link => {
+            const href = new URL(link.href);
+            href.searchParams.set('cluster', cluster);
+            link.href = href.toString();
+        });
+
         /**
          * Submit Form Cluster
          */

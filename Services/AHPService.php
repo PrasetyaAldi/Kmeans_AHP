@@ -247,7 +247,7 @@ class AHPService
     {
         $centroids = Centroid::where('cluster', $cluster)->pluck('normalize_id')->toArray();
 
-        return WeightAlternatif::with(['data', 'criteria'])->where('criteria_id', $criteriaId)->whereIn('normalize_id', $centroids)->get();
+        return WeightAlternatif::with(['data', 'criteria'])->where('criteria_id', $criteriaId)->whereIn('normalize_id', $centroids)->paginate(10);
     }
 
     /**

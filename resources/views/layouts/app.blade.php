@@ -80,6 +80,13 @@
         ::-webkit-scrollbar-thumb:hover {
             background: #C0C3C9;
         }
+
+        .headcol {
+            position: sticky;
+            left: 0;
+            z-index: 1;
+            background-color: #ffffff;
+        }
     </style>
 </head>
 

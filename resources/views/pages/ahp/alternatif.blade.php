@@ -34,7 +34,7 @@
                     </div>
                 </div>
                 <div class="card-body">
-                    @if (!empty($alternatif_weight->toArray()))
+                    @if (!empty($alternatif_weight->items()))
                         <table class="table">
                             <thead>
                                 <tr>
@@ -53,16 +53,22 @@
                         </table>
                     @else
                         <div style="width:100%;overflow-x:scroll">
-                            <table class="table">
-                                <thead>
-                                    <tr>
-                                        <th></th>
-                                        @foreach ($data as $item)
-                                            <th>{{ $item->data->nama_pemilik }}</th>
-                                        @endforeach
-                                    </tr>
-                                </thead>
-                                <tbody>
+                            <form action="{{ route('ahps.store-weight-alternatif') }}" method="post"
+                                class="formWeightAlternatif">
+                                @csrf
+                                <input type="hidden" name="criteria_id" value="{{ $active }}">
+                                <input type="hidden" name="cluster" value="{{ $select_cluster }}">
+                                <input type="hidden" name="json_data" value="" id="json_data">
+                                <table class="table">
+                                    <thead>
+                                        <tr>
+                                            <th></th>
+                                            @foreach ($data as $item)
+                                                <th>{{ $item->data->nama_pemilik }}</th>
+                                            @endforeach
+                                        </tr>
+                                    </thead>
+                                    {{-- <tbody>
                                     <form action="{{ route('ahps.store-weight-alternatif') }}" method="post"
                                         class="formWeightAlternatif">
                                         @csrf
@@ -70,13 +76,15 @@
                                         <input type="hidden" name="cluster" value="{{ $select_cluster }}">
                                         @foreach ($data as $key => $item)
                                             <tr>
-                                                <th>{{ $item->data->nama_pemilik }}</th>
+                                                <th class="headcol">{{ $item->data->nama_pemilik }}</th>
                                                 @foreach ($data as $key2 => $item2)
                                                     <td>
                                                         @if ($key == $key2)
                                                             <input type="number" class="form-control"
                                                                 name="data[{{ $key }}][{{ $key2 }}]"
                                                                 id="data[{{ $key }}][{{ $key2 }}]"
+                                                                data-col="{{ $key2 }}"
+                                                                data-row="{{ $key }}"
                                                                 value="{{ old('data[' . $key . '][' . $key2 . ']') ?? 1 }}"
                                                                 min="1" max="9" readonly
                                                                 style="background-color: gray">
@@ -84,6 +92,8 @@
                                                             <input type="number" class="form-control"
                                                                 name="data[{{ $key }}][{{ $key2 }}]"
                                                                 id="data[{{ $key }}][{{ $key2 }}]"
+                                                                data-col="{{ $key2 }}"
+                                                                data-row="{{ $key }}"
                                                                 value="{{ old('data[' . $key . '][' . $key2 . ']') ?? 1 }}">
                                                         @endif
                                                     </td>
@@ -91,26 +101,43 @@
                                             </tr>
                                         @endforeach
                                     </form>
-                                </tbody>
-                            </table>
+                                </tbody> --}}
+                                    <tbody id="dynamic-tbody">
+                                        <!-- Tampilkan spinner saat proses render data belum selesai -->
+                                        <tr>
+                                            <td colspan="{{ count($data) + 1 }}">
+                                                <div class="spinner-border text-primary" role="status">
+                                                    <span class="visually-hidden">Loading...</span>
+                                                </div>
+                                                <span>Menunggu Render Data Selesai...</span>
+                                            </td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </form>
                         </div>
                     @endif
                 </div>
-                <div class="card-footer d-flex justify-content-end">
-                    @if (!empty($alternatif_weight->toArray()))
-                        <form action="{{ route('ahps.reset-weight-alternatif') }}" method="post">
-                            @csrf
-                            <input type="hidden" name="criteria_id" value="{{ $active }}">
-                            <input type="hidden" name="cluster" value="{{ $select_cluster }}">
-                            <button type="submit" class="btn btn-warning"
-                                style="background-color: var(--bs-warning-bg-subtle)"><i class="fa-solid fa-gear"></i>
-                                Hitung
-                                Ulang</button>
-                        </form>
+                <div class="card-footer">
+                    @if (!empty($alternatif_weight->items()))
+                        <div class="d-flex justify-content-between">
+                            <form action="{{ route('ahps.reset-weight-alternatif') }}" method="post">
+                                @csrf
+                                <input type="hidden" name="criteria_id" value="{{ $active }}">
+                                <input type="hidden" name="cluster" value="{{ $select_cluster }}">
+                                <button type="submit" class="btn btn-warning"
+                                    style="background-color: var(--bs-warning-bg-subtle)"><i class="fa-solid fa-gear"></i>
+                                    Hitung
+                                    Ulang</button>
+                            </form>
+                            {{ $alternatif_weight->links() }}
+                        </div>
                     @else
-                        <button class="btn btn-primary" onclick="submitFormWieghtAlternatif()">
-                            <i class="fa-solid fa-floppy-disk"></i> Submit
-                        </button>
+                        <div class="d-flex justify-content-end">
+                            <button class="btn btn-primary" onclick="submitFormWieghtAlternatif()">
+                                <i class="fa-solid fa-floppy-disk"></i> Submit
+                            </button>
+                        </div>
                     @endif
                 </div>
             </div>
@@ -121,6 +148,40 @@
 @section('scripts')
     <script>
         document.addEventListener('DOMContentLoaded', function() {
+            // hanya jika alternatif weight empty
+            @if (empty($alternatif_weight->items()))
+                const renderDataTable = () => {
+                    // const clusterId = document.querySelector('select[name="cluster"]').value
+                    const tbody = document.getElementById('dynamic-tbody')
+                    const data = @json($data);
+                    tbody.innerHTML = ''
+
+                    data.forEach((item, key) => {
+                        const newRow = document.createElement('tr');
+                        newRow.innerHTML = `
+                            <th class="headcol">${item.data.nama_pemilik}</th>
+                        `
+
+                        data.forEach((item2, key2) => {
+                            const isReadOnly = key == key2 ? 'readonly' : ''
+                            const bgColor = key == key2 ? 'background-color: gray' : ''
+                            const value = key == key2 ? 1 : (item.data[key2] ?? 1)
+
+                            newRow.innerHTML += `
+                                <td>
+                                    <input type="number" class="form-control" 
+                                    name="data[${key}][${key2}]" id="data[${key}][${key2}]"
+                                    data-col="${key2}" data-row="${key}" value="${value}" 
+                                    min="1" max="9" ${isReadOnly} style="${bgColor}">
+                                </td>
+                            `
+                        })
+                        tbody.appendChild(newRow)
+                    })
+                }
+
+                renderDataTable()
+            @endif
             const input = document.querySelectorAll('input[type="number"]')
             input.forEach((item) => {
                 item.addEventListener('change', function() {
@@ -134,6 +195,7 @@
                     const input2 = document.getElementById(`data[${id[2]}][${id[1]}]`)
                     input2.value = 1 / value
                 })
+
             })
         })
 
@@ -149,7 +211,29 @@
          * Submit Form Weight Alternatif
          */
         const submitFormWieghtAlternatif = () => {
+            const jsonData = {}
             const form = document.querySelector('.formWeightAlternatif')
+            const inputNumber = document.querySelectorAll('input[type="number"]')
+            inputNumber.forEach((inputElement) => {
+                const row = inputElement.dataset.row;
+                const col = inputElement.dataset.col;
+                const value = inputElement.value;
+
+                // Membentuk data ke dalam objek JSON
+                if (!jsonData[row]) {
+                    jsonData[row] = {};
+                }
+                jsonData[row][col] = parseInt(value);
+            });
+            const hiddenJsonData = document.getElementById('json_data')
+            hiddenJsonData.value = JSON.stringify(jsonData)
+            // const inputElement = document.createElement('input')
+            // inputElement.setAttribute('type', 'hidden')
+            // inputElement.setAttribute('name', 'data')
+            // inputElement.setAttribute('value', JSON.stringify(jsonData))
+            // inputElement.setAttribute('id', 'jsonData')
+            // form.appendChild(inputElement)
+            // console.log(document.getElementById('jsonData').value)
             form.submit()
         }
 

@@ -19,14 +19,6 @@ class AHPController extends Controller
     }
 
     /**
-     * Show the form for creating a new resource.
-     */
-    public function create()
-    {
-        //
-    }
-
-    /**
      * Store a newly created resource in storage.
      */
     public function store(Request $request, AHPService $ahpService)
@@ -69,12 +61,12 @@ class AHPController extends Controller
      */
     public function weightAlternatif(Request $request, AHPService $ahpService)
     {
+        // dd($request->all());
         $criteria = $request->criteria ?? '1';
         $cluster = $request->cluster ?? 'C1';
         $kMeansService = new KmeansService;
         $alternatifWeight = $ahpService->getAllWeightAlternatif($criteria, $cluster);
         $data['data'] = $ahpService->getAlternatif($cluster);
-        // dd($data['data']);
         $data['criterias'] = $ahpService->getCriteria();
         $data['clusters'] = $kMeansService->getClusterName();
         $data['select_cluster'] = $cluster;
@@ -92,7 +84,7 @@ class AHPController extends Controller
      */
     public function storeWeightAlternatif(Request $request, AHPService $ahpService)
     {
-        $data = $request->data;
+        $data = json_decode($request->json_data, true);
         $criteria_id = $request->criteria_id;
         $cluster = $request->cluster;
 
@@ -177,37 +169,5 @@ class AHPController extends Controller
         }
 
         return redirect()->back()->with('success', 'Berhasil menghitung hasil akhir');
-    }
-
-    /**
-     * Display the specified resource.
-     */
-    public function show(string $id)
-    {
-        //
-    }
-
-    /**
-     * Show the form for editing the specified resource.
-     */
-    public function edit(string $id)
-    {
-        //
-    }
-
-    /**
-     * Update the specified resource in storage.
-     */
-    public function update(Request $request, string $id)
-    {
-        //
-    }
-
-    /**
-     * Remove the specified resource from storage.
-     */
-    public function destroy(string $id)
-    {
-        //
     }
 }

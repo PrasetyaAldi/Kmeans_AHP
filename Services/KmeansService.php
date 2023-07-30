@@ -62,6 +62,7 @@ class KmeansService
      */
     public function normalizationData()
     {
+        set_time_limit(1000);
         $kMeans = new KmeansData();
         $normalize = new Normalization();
         $kMeans = $kMeans->all();
@@ -75,7 +76,7 @@ class KmeansService
             $data['data_id'] = $kmean->id;
             foreach ($kmean->getAttributes() as $column => $value) {
                 if (in_array($column, $columnToNormalize)) {
-                    $data[$column] = $this->normalize($value, $column);
+                    $data[$column] = ($value - $kMeans->min($column)) / ($kMeans->max($column) - $kMeans->min($column));
                 }
             }
             $dataNormalize[] = $data;
@@ -100,13 +101,11 @@ class KmeansService
      * 
      * 
      */
-    public function getInitialCentroid(int $cluster = 3)
+    public function getInitialCentroid()
     {
         $normalize = new Normalization();
-        $banyakData = $normalize->all()->count();
 
-        $normalize = $normalize->whereIn('data_id', [8, 4, 13])->get(); // sementara
-        // $normalize = $normalize->inRandomOrder()->take($cluster)->get();
+        $normalize = $normalize->inRandomOrder()->take(3)->get();
 
         $centroids = [];
         foreach ($normalize as $index => $data) {
@@ -171,7 +170,15 @@ class KmeansService
      */
     public function getNormalization(): array
     {
-        return Normalization::all()->toArray();
+        $normalize = Normalization::all()->toArray();
+
+        // hanya jika normalize kosong
+        if (empty($normalize)) {
+            $this->normalizationData();
+            $normalize = Normalization::all()->toArray();
+        }
+
+        return $normalize;
     }
 
     /**
@@ -181,7 +188,7 @@ class KmeansService
      */
     public function getCluster(int $paginate = 10)
     {
-        $cluster = Centroid::selectRaw('cluster, COUNT(1) as jumlah, nilai_sse')->groupBy('cluster', 'nilai_sse')->orderBy('cluster');
+        $cluster = Centroid::selectRaw('cluster, count(*) as jumlah, nilai_sse')->groupBy('cluster', 'nilai_sse')->orderBy('jumlah', 'desc');
         return $cluster->paginate($paginate);
     }
 

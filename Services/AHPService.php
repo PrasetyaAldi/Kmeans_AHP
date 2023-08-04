@@ -273,7 +273,7 @@ class AHPService
         foreach ($centroids as $centroid) {
             $row = [];
             foreach ($criteria as $c) {
-                $row[] = $alternatif->where('normalize_id', $centroid)->where('criteria_id', $c->criteria_id)->first()->eigen_value * $c->bobot;
+                $row[] = $alternatif->where('normalize_id', $centroid)->where('criteria_id', $c->criteria_id)->first()?->eigen_value * $c->bobot;
             }
             $result[] = $row;
         }

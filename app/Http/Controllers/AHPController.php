@@ -170,4 +170,15 @@ class AHPController extends Controller
 
         return redirect()->back()->with('success', 'Berhasil menghitung hasil akhir');
     }
+
+    /**
+     * get data alternatif
+     * 
+     */
+    public function getDataAlternatif(Request $request, AHPService $ahpService)
+    {
+        $cluster = $request->cluster ?? 'C1';
+        $data = $ahpService->getAlternatif($cluster);
+        return response()->json($data);
+    }
 }

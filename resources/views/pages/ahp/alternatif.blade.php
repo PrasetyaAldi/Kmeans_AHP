@@ -150,53 +150,48 @@
         document.addEventListener('DOMContentLoaded', function() {
             // hanya jika alternatif weight empty
             @if (empty($alternatif_weight->items()))
-                const renderDataTable = () => {
-                    // const clusterId = document.querySelector('select[name="cluster"]').value
-                    const tbody = document.getElementById('dynamic-tbody')
-                    const data = @json($data);
-                    tbody.innerHTML = ''
+                fetch(`{{ route('ahps.data-alternatif') }}?cluster={{ $select_cluster }}`).then(res => res.json())
+                    .then(res => {
+                        const clusterId = document.querySelector('select[name="cluster"]').value
+                        const tbody = document.getElementById('dynamic-tbody')
+                        const data = res;
+                        tbody.innerHTML = ''
 
-                    data.forEach((item, key) => {
-                        const newRow = document.createElement('tr');
-                        newRow.innerHTML = `
-                            <th class="headcol">${item.data.nama_pemilik}</th>
-                        `
+                        data.forEach((item, key) => {
+                            const newRow = document.createElement('tr');
+                            newRow.innerHTML = `<th class="headcol">${item.data.nama_pemilik}</th>`
+                            data.forEach((item2, key2) => {
+                                const isReadOnly = key == key2 ? 'readonly' : ''
+                                const bgColor = key == key2 ? 'background-color: gray' : ''
+                                const value = key == key2 ? 1 : (item.data[key2] ?? 1)
 
-                        data.forEach((item2, key2) => {
-                            const isReadOnly = key == key2 ? 'readonly' : ''
-                            const bgColor = key == key2 ? 'background-color: gray' : ''
-                            const value = key == key2 ? 1 : (item.data[key2] ?? 1)
-
-                            newRow.innerHTML += `
-                                <td>
+                                newRow.innerHTML += `<td>
                                     <input type="number" class="form-control" 
                                     name="data[${key}][${key2}]" id="data[${key}][${key2}]"
                                     data-col="${key2}" data-row="${key}" value="${value}" 
                                     min="1" max="9" ${isReadOnly} style="${bgColor}">
-                                </td>
-                            `
+                                </td>`
+                            })
+                            tbody.appendChild(newRow)
                         })
-                        tbody.appendChild(newRow)
-                    })
-                }
-
-                renderDataTable()
+                        const input = document.querySelectorAll('input[type="number"]')
+                        input.forEach((item) => {
+                            item.addEventListener('change', function() {
+                                console.log(this.id)
+                                const id = this.id.split(/[\[\]]/).filter(Boolean)
+                                const value = this.value
+                                if (value > 9 || value < 1) {
+                                    alert('Nilai Maksimal 9 dan Minimal 0')
+                                    this.value = 1
+                                    value = 1
+                                }
+                                const input2 = document.getElementById(
+                                    `data[${id[2]}][${id[1]}]`)
+                                input2.value = 1 / value
+                            })
+                        })
+                    }).catch(err => console.log(err))
             @endif
-            const input = document.querySelectorAll('input[type="number"]')
-            input.forEach((item) => {
-                item.addEventListener('change', function() {
-                    const id = this.id.split(/[\[\]]/).filter(Boolean)
-                    const value = this.value
-                    if (value > 9 || value < 1) {
-                        alert('Nilai Maksimal 9 dan Minimal 0')
-                        this.value = 1
-                        value = 1
-                    }
-                    const input2 = document.getElementById(`data[${id[2]}][${id[1]}]`)
-                    input2.value = 1 / value
-                })
-
-            })
         })
 
         const cluster = new URLSearchParams(window.location.search).get('cluster');

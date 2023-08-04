@@ -41,6 +41,7 @@ Route::group(['middleware' => 'auth'], function () {
         Route::post('reset', [AHPController::class, 'resetWeightCriteria'])->name('reset');
         Route::post('reset-alternatif', [AHPController::class, 'resetWeightAlternatif'])->name('reset-weight-alternatif');
         Route::post('store-weight-alternatif', [AHPController::class, 'storeWeightAlternatif'])->name('store-weight-alternatif');
+        Route::get('data-alternatif', [AHPController::class, 'getDataAlternatif'])->name('data-alternatif');
     });
     Route::resource('ahps', AHPController::class);
     Route::get('/logout', [LoginController::class, 'logout'])->name('logout');

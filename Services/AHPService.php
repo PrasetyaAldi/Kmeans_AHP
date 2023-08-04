@@ -264,7 +264,7 @@ class AHPService
         $alternatif = WeightAlternatif::whereIn('normalize_id', $centroids)->get();
 
         // hanya jika alternatif null
-        if ($alternatif->isEmpty()) {
+        if ($alternatif->isEmpty() || empty($alternatif)) {
             return [];
         }
 

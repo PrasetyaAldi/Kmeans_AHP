@@ -163,7 +163,7 @@
                             data.forEach((item2, key2) => {
                                 const isReadOnly = key == key2 ? 'readonly' : ''
                                 const bgColor = key == key2 ? 'background-color: gray' : ''
-                                const value = key == key2 ? 1 : (item.data[key2] ?? 1)
+                                const value = key == key2 ? 1 : 1
 
                                 newRow.innerHTML += `<td>
                                     <input type="number" class="form-control" 
@@ -177,7 +177,6 @@
                         const input = document.querySelectorAll('input[type="number"]')
                         input.forEach((item) => {
                             item.addEventListener('change', function() {
-                                console.log(this.id)
                                 const id = this.id.split(/[\[\]]/).filter(Boolean)
                                 const value = this.value
                                 if (value > 9 || value < 1) {

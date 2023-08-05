@@ -283,10 +283,8 @@ class AHPService
             $finalResult[] = array_sum($value);
         }
 
-        // sorting
-        usort($finalResult, function ($a, $b) {
-            return $a <=> $b;
-        });
+        // sorting nilai akhir php dari yang terbesar
+        arsort($finalResult);
 
         // menghitung peringkat alternatif
         $rank = [];

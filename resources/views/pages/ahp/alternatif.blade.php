@@ -20,11 +20,12 @@
                         <h3>Menghitung Bobot Alternatif</h3>
                         <div class="d-flex align-items-center">
                             <span class="me-2 fw-semibold">Pilih Cluster :</span>
-                            <form action="{{ route('ahps.weight-alternatif') }}" method="GET" class="formCluster">
-                                <select name="cluster" class="form-control" onchange="submitFormCluster()">
+                            <form class="formCluster">
+                                <select name="cluster" class="form-control">
                                     @foreach ($clusters as $cluster)
                                         <option value="{{ $cluster->cluster }}"
-                                            {{ $cluster->cluster == $select_cluster ? 'selected' : '' }}>
+                                            {{ $cluster->cluster == $select_cluster ? 'selected' : '' }}
+                                            onclick="console.log('test')">
                                             {{ $cluster->cluster }}
                                         </option>
                                     @endforeach
@@ -256,5 +257,21 @@
 
             window.location.href = url
         }
+
+        /**
+         * pilih cluster
+         */
+        const mySelect = document.querySelector('select[name="cluster"]')
+        mySelect.addEventListener('change', function(event) {
+            const url = new URL(window.location.href)
+            const urlSearch = new URLSearchParams(url.search)
+            if (urlSearch.has('cluster')) {
+                urlSearch.delete('cluster')
+            }
+            urlSearch.set('cluster', this.value)
+            url.search = urlSearch.toString()
+
+            window.location.href = url
+        })
     </script>
 @endsection

@@ -163,7 +163,8 @@
                             data.forEach((item2, key2) => {
                                 const isReadOnly = key == key2 ? 'readonly' : ''
                                 const bgColor = key == key2 ? 'background-color: gray' : ''
-                                const value = key == key2 ? 1 : 1
+                                const value = key == key2 ? 1 : Math.floor(Math.random() * 9) +
+                                    1
 
                                 newRow.innerHTML += `<td>
                                     <input type="number" class="form-control" 
@@ -188,6 +189,14 @@
                                     `data[${id[2]}][${id[1]}]`)
                                 input2.value = 1 / value
                             })
+                            const col = item.getAttribute('data-col')
+                            const row = item.getAttribute('data-row')
+                            if (col != row) {
+                                // membuat nilai inputan berpasangan berubah dengan nilai awal di input
+                                const input2 = document.getElementById(
+                                    `data[${col}][${row}]`)
+                                input2.value = 1 / item.value
+                            }
                         })
                     }).catch(err => console.log(err))
             @endif
@@ -226,17 +235,10 @@
                 if (!jsonData[row]) {
                     jsonData[row] = {};
                 }
-                jsonData[row][col] = parseInt(value);
+                jsonData[row][col] = parseFloat(value);
             });
             const hiddenJsonData = document.getElementById('json_data')
             hiddenJsonData.value = JSON.stringify(jsonData)
-            // const inputElement = document.createElement('input')
-            // inputElement.setAttribute('type', 'hidden')
-            // inputElement.setAttribute('name', 'data')
-            // inputElement.setAttribute('value', JSON.stringify(jsonData))
-            // inputElement.setAttribute('id', 'jsonData')
-            // form.appendChild(inputElement)
-            // console.log(document.getElementById('jsonData').value)
             form.submit()
         }
 

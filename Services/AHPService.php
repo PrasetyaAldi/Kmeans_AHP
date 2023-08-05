@@ -284,9 +284,7 @@ class AHPService
         }
 
         // sorting
-        usort($finalResult, function ($a, $b) {
-            return $a <=> $b;
-        });
+        array_multisort($finalResult, SORT_DESC);
 
         // menghitung peringkat alternatif
         $rank = [];

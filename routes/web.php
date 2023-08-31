@@ -28,10 +28,14 @@ Route::group(['middleware' => 'guest'], function () {
 Route::resource('home', HomeController::class);
 
 Route::group(['middleware' => 'auth'], function () {
-    Route::resource('k-means', KmeansController::class);
     Route::prefix('k-means')->as('k-means.')->group(function () {
+        Route::get('transformation', [KmeansController::class, 'indexTransformation'])->name('transformation');
+        Route::get('normalization', [KmeansController::class, 'indexNormalization'])->name('normalization');
+        Route::post('proses-transformation', [KmeansController::class, 'processTransformation'])->name('proses-transformation');
+        Route::post('proses-normalization', [KmeansController::class, 'processNormalization'])->name('proses-normalization');
         Route::post('import', [KmeansController::class, 'import'])->name('import');
     });
+    Route::resource('k-means', KmeansController::class);
     Route::get('cluster', [KmeansController::class, 'cluster'])->name('cluster');
     Route::post('cluster', [KmeansController::class, 'processCluster'])->name('process');
 

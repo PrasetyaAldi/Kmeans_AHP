@@ -1,3 +1,15 @@
 body {
     font-family: "Poppins", sans-serif;
+    min-height: 100vh; /* Ini akan memastikan footer tetap di bawah halaman jika kontennya kurang dari viewport height */
+    position: relative; /* Diperlukan untuk mengatur posisi footer */
+    margin: 0;
+    padding: 0;
+}
+
+.footer {
+    position: absolute;
+    bottom: 0; /* Tempatkan footer di bawah */
+    width: 100%; /* Lebar footer mengisi seluruh lebar halaman */
+    background-color: #f8f9fa; /* Warna latar belakang footer */
+    padding: 20px 0; /* Ruang atas dan bawah footer */
 }

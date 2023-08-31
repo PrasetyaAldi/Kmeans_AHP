@@ -3,34 +3,95 @@
 namespace App\Http\Controllers;
 
 use App\Imports\KmeansImport;
+use App\Models\KmeansDataReal;
 use Illuminate\Http\Request;
 use Maatwebsite\Excel\Facades\Excel;
 use Services\KmeansService;
 
 class KmeansController extends Controller
 {
+    protected $columns = [
+        'Nama Pemilik',
+        'Jumlah Pekerja',
+        'Jenis Produksi',
+        'Kapasitas Produksi',
+        'Harga Satuan',
+        'Nilai Produksi',
+        'Nilai Investasi',
+        'Umur',
+        'Pendidikan',
+        'Surat Izin',
+        'Motif',
+    ];
     /**
      * Display a listing of the resource.
      */
     public function index(KmeansService $kmeansService)
     {
-        $kmeansData = $kmeansService->getListData();
-        $data['data'] = $kmeansData;
-        $data['columns'] = [
-            'Nama Pemilik',
-            'Jumlah Pekerja',
-            'Jenis Produksi',
-            'Kapasitas Produksi',
-            'Harga Satuan',
-            'Nilai Produksi',
-            'Nilai Investasi',
-            'Umur',
-            'Pendidikan',
-            'Surat Izin',
-            'Motif',
-        ];
+        $kmeansDataReal = $kmeansService->getListDataReals();
+        $data['data'] = $kmeansDataReal;
+        $data['columns'] = $this->columns;
 
         return view('pages.k-means.index', $data);
+    }
+
+    public function indexNormalization(KmeansService $kmeansService)
+    {
+        $kmeansDataReal = $kmeansService->getListNormalization();
+        if (empty($kmeansDataReal->items())) {
+            $kmeansDataReal = $kmeansService->getListData();
+        }
+        $data['data'] = $kmeansDataReal;
+        $data['columns'] = $this->columns;
+        $data['buttonAction'] = [
+            ['label' => 'Proses Normalisasi', 'route' => route('k-means.proses-normalization')]
+        ];
+
+        return view('pages.k-means.data', $data);
+    }
+
+    public function indexTransformation(KmeansService $kmeansService)
+    {
+        $kmeansDataReal = $kmeansService->getListData();
+        if (empty($kmeansDataReal->items())) {
+            $kmeansDataReal = $kmeansService->getListDataReals();
+        }
+        $data['data'] = $kmeansDataReal;
+        $data['columns'] = $this->columns;
+        $data['buttonAction'] = [
+            ['label' => 'Proses Transformasi', 'route' => route('k-means.proses-transformation')]
+        ];
+
+        return view('pages.k-means.data', $data);
+    }
+
+    public function processTransformation(KmeansService $kmeansService)
+    {
+        // hanya jika table transformation tidak kosong
+        if (!empty($kmeansService->getListData()->items())) {
+            return redirect()->back()->with('error', 'Data sudah di transformasi');
+        }
+        try {
+            $kmeansService->procesLabelEncoding();
+        } catch (\Exception $e) {
+            return redirect()->back()->with('error', $e->getMessage());
+        }
+        return redirect()->back()->with('success', 'Berhasil Melakukan proses transformasi');
+    }
+
+    public function processNormalization(KmeansService $kmeansService)
+    {
+        // hanya jika table normalization tidak kosong
+        if (!empty($kmeansService->getListNormalization()->items())) {
+            return redirect()->back()->with('error', 'Data sudah normalisasi');
+        }
+
+        try {
+            $kmeansService->normalizationData();
+        } catch (\Exception $e) {
+            return redirect()->back()->with('error', $e->getMessage());
+        }
+        return redirect()->back()->with('success', 'Berhasil Melakukan Normal');
     }
 
     public function cluster(KmeansService $kmeansService)

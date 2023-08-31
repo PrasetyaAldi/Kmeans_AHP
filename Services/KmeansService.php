@@ -4,6 +4,7 @@ namespace Services;
 
 use App\Models\Centroid;
 use App\Models\KmeansData;
+use App\Models\KmeansDataReal;
 use App\Models\Normalization;
 use App\Models\WeightAlternatif;
 
@@ -33,12 +34,27 @@ class KmeansService
      */
     public function saveKmeans(array $data)
     {
-        $kmeans = new KmeansData();
+        $kmeans = new KmeansDataReal();
 
         $kmeans->fill($data);
         $kmeans->save();
 
         return $kmeans;
+    }
+
+    /**
+     * Menyimpan data hasil transformasi
+     * 
+     * @param array $data
+     */
+    public function saveTransformation(array $data)
+    {
+        $transformation = new KmeansData();
+
+        $transformation->fill($data);
+        $transformation->save();
+
+        return $transformation;
     }
 
     /**
@@ -54,6 +70,21 @@ class KmeansService
             return KmeansData::orderBy('id')->paginate($paginate);
         }
         return KmeansData::count();
+    }
+
+    /**
+     * get list data
+     * 
+     * @param int $paginate
+     * 
+     * @return KmeansData
+     */
+    public function getListDataReals(int $paginate = 10, bool $isCount = false)
+    {
+        if (!$isCount) {
+            return KmeansDataReal::orderBy('id')->paginate($paginate);
+        }
+        return KmeansDataReal::count();
     }
 
     /**
@@ -182,6 +213,21 @@ class KmeansService
     }
 
     /**
+     * Get list normalization
+     * 
+     */
+    public function getListNormalization(int $limit = 10)
+    {
+        $normalize = Normalization::query()->with('data');
+
+        $normalize = $normalize->paginate($limit);
+        foreach ($normalize as $item) {
+            $item->nama_pemilik = $item->data->nama_pemilik;
+        }
+        return $normalize;
+    }
+
+    /**
      * Mendapatkan list cluster
      * 
      * @param int $paginare
@@ -284,6 +330,40 @@ class KmeansService
     }
 
     /**
+     * Process label encoding
+     * 
+     */
+    public function procesLabelEncoding()
+    {
+        $kmeansData = new KmeansDataReal();
+        $columns = ['jenis_produksi', 'pendidikan', 'surat_izin', 'motif'];
+        $mapping = [];
+
+        // labeling
+        foreach ($columns as $column) {
+            $values = $kmeansData->pluck($column)->unique();
+            $columnMapping = [];
+
+            foreach ($values as $index => $value) {
+                $columnMapping[$value] = $index + 1;
+            }
+            $mapping[$column] = $columnMapping;
+        }
+
+        $kmeansData->chunk(200, function ($items) use ($mapping, $columns) {
+            foreach ($items as $item) {
+                foreach ($columns as $column) {
+                    $encodeValue = $mapping[$column][$item->{$column}];
+                    $item->{$column} = $encodeValue;
+                }
+                $this->saveTransformation($item->toArray());
+            }
+        });
+
+        return true;
+    }
+
+    /**
      * Mendapatkan nama cluster
      * 
      */
@@ -299,9 +379,10 @@ class KmeansService
      */
     public function checkData(): void
     {
-        $data = KmeansData::all();
+        $data = KmeansDataReal::all();
         // hanya jika data tidak kosong
         if ($data->count() > 0) {
+            KmeansDataReal::truncate();
             KmeansData::truncate();
             Centroid::truncate();
             Normalization::truncate();

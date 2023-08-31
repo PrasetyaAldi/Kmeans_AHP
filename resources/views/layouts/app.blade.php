@@ -18,6 +18,12 @@
     <style>
         body {
             background-color: #f4f8fb;
+            min-height: 100vh;
+            /* Ini akan memastikan footer tetap di bawah halaman jika kontennya kurang dari viewport height */
+            position: relative;
+            /* Diperlukan untuk mengatur posisi footer */
+            margin: 0;
+            padding: 0;
         }
 
         .bg-grey-200 {
@@ -88,6 +94,18 @@
             z-index: 1;
             background-color: #ffffff;
         }
+
+        .footer {
+            position: absolute;
+            bottom: 0;
+            /* Tempatkan footer di bawah */
+            width: 100%;
+            /* Lebar footer mengisi seluruh lebar halaman */
+            background-color: #f8f9fa;
+            /* Warna latar belakang footer */
+            padding: 20px 0;
+            /* Ruang atas dan bawah footer */
+        }
     </style>
 </head>
 
@@ -112,6 +130,11 @@
         </main>
         @yield('modal')
     </div>
+    <footer class="footer">
+        <div class="container text-center">
+            <p>&copy; {{ date('Y') }} Kmeans Euclidean. Make with <i class="fa-solid fa-heart"></i></p>
+        </div>
+    </footer>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"
         integrity="sha384-geWF76RCwLtnZ8qwWowPQNguL3RmwHVBC9FhGdlKrxdiJJigb/j/68SIy3Te4Bkz" crossorigin="anonymous">
     </script>

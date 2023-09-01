@@ -19,8 +19,6 @@
         body {
             background-color: #f4f8fb;
             min-height: 100vh;
-            /* Ini akan memastikan footer tetap di bawah halaman jika kontennya kurang dari viewport height */
-            position: relative;
             /* Diperlukan untuk mengatur posisi footer */
             margin: 0;
             padding: 0;
@@ -96,7 +94,6 @@
         }
 
         .footer {
-            position: absolute;
             bottom: 0;
             /* Tempatkan footer di bawah */
             width: 100%;

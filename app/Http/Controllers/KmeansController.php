@@ -94,6 +94,12 @@ class KmeansController extends Controller
         return redirect()->back()->with('success', 'Berhasil Melakukan Normal');
     }
 
+    public function optimasiCluster(KmeansService $kmeansService)
+    {
+        $data['data'] = $kmeansService->getTempCluster();
+        return view('pages.k-means.optimasi_cluster', $data);
+    }
+
     public function cluster(KmeansService $kmeansService)
     {
         $data['data'] = $kmeansService->getCluster();
@@ -133,19 +139,35 @@ class KmeansController extends Controller
      * Get centroid
      * 
      */
-    public function processCluster(Request $request, KmeansService $kmeansService)
+    public function processOptimasiCluster(Request $request, KmeansService $kmeansService)
     {
-        $message = 'Process Cluster Berhasil';
-        if ($request->has('reset_cluster') && $request->reset_cluster) {
-            $kmeansService->resetCluster();
-            $message = 'Update Cluster Berhasil';
-        }
-        $centroids = $kmeansService->getInitialCentroid();
+        $kmeansService->resetCluster();
+        $centroids = $kmeansService->getInitialCentroid($request->banyak_cluster);
 
         $normalizations = $kmeansService->getNormalization();
 
-        // // process
-        $data = $kmeansService->processKmeans($normalizations, $centroids);
+        // process
+        $kmeansService->searchBestCluster($normalizations, $centroids);
+
+        // $data = $kmeansService->processKmeans($normalizations, $centroids);
+        return redirect()->to(route('optimasi-cluster'))->with('success', 'Berhasil menghitung optimasi cluster');
+    }
+
+    /**
+     * Get centroid
+     * 
+     */
+    public function processCluster(Request $request, KmeansService $kmeansService)
+    {
+        $message = 'Process Cluster Berhasil';
+        $kmeansService->resetCluster(false);
+        $centroids = $kmeansService->getInitialCentroid($request->banyak_cluster, false);
+
+        $normalizations = $kmeansService->getNormalization();
+
+        // process
+        $kmeansService->processKmeans($normalizations, $centroids);
+
         return redirect()->to(route('cluster'))->with('success', $message);
     }
 }

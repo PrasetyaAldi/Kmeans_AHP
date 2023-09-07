@@ -16,7 +16,7 @@
                     <li class="nav-item"><a class="nav-link{{ request()->is('home') ? ' active fw-semibold' : '' }}"
                             href="{{ route('home.index') }}"><i class="fa-solid fa-house"></i> Home</a></li>
                     <li class="nav-item dropdown">
-                        <a class="nav-link dropdown-toggle{{ request()->is('k-means') || request()->is('cluster') || request()->is('k-means/*') ? ' active fw-semibold' : '' }}"
+                        <a class="nav-link dropdown-toggle{{ request()->is('k-means') || request()->is('cluster') || request()->is('k-means/*') || request()->is('optimasi-cluster') ? ' active fw-semibold' : '' }}"
                             href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
                             <i class="fa-solid fa-database"></i> Data
                         </a>
@@ -27,6 +27,8 @@
                                     href="{{ route('k-means.transformation') }}">Transformasi</a></li>
                             <li><a class="dropdown-item {{ request()->is('k-means/normalization') ? ' active' : '' }}"
                                     href="{{ route('k-means.normalization') }}">Normalisasi</a></li>
+                            <li><a class="dropdown-item {{ request()->is('optimasi-cluster') ? ' active' : '' }}"
+                                    href="{{ route('optimasi-cluster') }}">Optimasi Cluster</a></li>
                             <li><a class="dropdown-item {{ request()->is('cluster') ? ' active' : '' }}"
                                     href="{{ route('cluster') }}">Cluster</a></li>
                         </ul>

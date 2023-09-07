@@ -37,7 +37,9 @@ Route::group(['middleware' => 'auth'], function () {
     });
     Route::resource('k-means', KmeansController::class);
     Route::get('cluster', [KmeansController::class, 'cluster'])->name('cluster');
+    Route::get('optimasi-cluster', [KmeansController::class, 'optimasiCluster'])->name('optimasi-cluster');
     Route::post('cluster', [KmeansController::class, 'processCluster'])->name('process');
+    Route::post('optimasi-cluster', [KmeansController::class, 'processOptimasiCluster'])->name('process-optimasi');
 
     Route::prefix('ahps')->as('ahps.')->group(function () {
         Route::get('weight-alternatif', [AHPController::class, 'weightAlternatif'])->name('weight-alternatif');

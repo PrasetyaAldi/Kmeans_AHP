@@ -6,6 +6,7 @@ use App\Models\Centroid;
 use App\Models\KmeansData;
 use App\Models\KmeansDataReal;
 use App\Models\Normalization;
+use App\Models\TempCluster;
 use App\Models\WeightAlternatif;
 
 /**
@@ -122,9 +123,14 @@ class KmeansService
      * reset cluster
      * 
      */
-    public function resetCluster()
+    public function resetCluster(bool $isOptimization = true)
     {
-        return Centroid::truncate();
+        // hanya jika tidak optimisasi
+        if ($isOptimization) {
+            TempCluster::truncate();
+        } else {
+            Centroid::truncate();
+        }
     }
 
     /**
@@ -132,15 +138,28 @@ class KmeansService
      * 
      * 
      */
-    public function getInitialCentroid()
+    public function getInitialCentroid(int $countCentroid = null, bool $isOptimization = true)
     {
         $normalize = new Normalization();
-
-        $normalize = $normalize->inRandomOrder()->take(3)->get();
+        $banyakData = $normalize->count();
+        $cluster = $countCentroid ?? (int)sqrt($banyakData / 2);
 
         $centroids = [];
-        foreach ($normalize as $index => $data) {
-            $centroids[] = $data->getAttributes();
+
+        if ($isOptimization) {
+            for ($index = 1; $index <= $cluster; $index++) {
+                $tempCentroid = [];
+                $data = $normalize->inRandomOrder()->take($index)->get();
+                foreach ($data as $data) {
+                    $tempCentroid[] = $data->getAttributes();
+                }
+                $centroids[] = $tempCentroid;
+            }
+        } else {
+            $data = $normalize->inRandomOrder()->take($countCentroid)->get();
+            foreach ($data as $data) {
+                $centroids[] = $data->getAttributes();
+            }
         }
 
         return $centroids;
@@ -155,7 +174,6 @@ class KmeansService
     public function calculateDistance($centroid, $data)
     {
         $columnToNormalize = $this->columnToNormalize;
-
         $sum = 0;
         foreach ($data as $key => $value) {
             if (in_array($key, $columnToNormalize)) {
@@ -238,6 +256,11 @@ class KmeansService
         return $cluster->paginate($paginate);
     }
 
+    public function getTempCluster()
+    {
+        return TempCluster::all();
+    }
+
     /**
      * process k-means
      * 
@@ -255,29 +278,27 @@ class KmeansService
 
                 $minDistance = PHP_INT_MAX;
                 $closestCentroid = null;
-
-                foreach ($centroids as $index => $centroid) {
-                    $distance = $this->calculateDistance($centroid, $item);
+                foreach ($centroids as $index => $value) {
+                    $distance = $this->calculateDistance($value, $item);
 
                     if ($distance < $minDistance) {
                         $minDistance = $distance;
                         $closestCentroid = $index;
                     }
                 }
+
                 $sumSSE[$iterations][] = $minDistance;
                 $clusters[$closestCentroid]['data'][] = $item;
             }
 
             $oldCentroids = $centroids;
             $centroids = $this->updateCentroids($clusters);
-
             // hanya jika centroid tidak berubah
             if ($oldCentroids === $centroids) {
                 break;
             }
             $iterations++;
         }
-
         $sse = $this->calculateSSE($sumSSE);
 
         // menyimpan ke database
@@ -293,6 +314,67 @@ class KmeansService
         }
 
         return ['clusters' => $clusters];
+    }
+
+    /**
+     * mengetahui cluster terbaik
+     * 
+     */
+    public function searchBestCluster(array $data, array $centroids, int $maxIterations = 100)
+    {
+        $iterations = 0;
+        $clusters = [];
+        $sumSSE = [];
+        $sse = [];
+        $dataClusters = [];
+        $dataSSE = [];
+
+        foreach ($centroids as $key => $centroid) {
+            while ($iterations < $maxIterations) {
+                $clusters[$key] = [];
+                foreach ($data as $item) {
+                    $minDistance = PHP_INT_MAX;
+                    $closestCentroid = null;
+                    foreach ($centroid as $index => $value) {
+                        $distance = $this->calculateDistance($value, $item);
+
+                        if ($distance < $minDistance) {
+                            $minDistance = $distance;
+                            $closestCentroid = $index;
+                        }
+                    }
+
+                    $sumSSE[$key][$iterations][] = $minDistance;
+                    $clusters[$key][$closestCentroid]['data'][] = $item;
+                }
+                $oldCentroids = $centroid;
+                $centroid = $this->updateCentroids($clusters[$key]);
+
+                if ($oldCentroids === $centroid) {
+                    break;
+                }
+                $iterations++;
+            }
+
+            $sse[$key] = $this->calculateSSE($sumSSE[$key]);
+        }
+
+        $tempCluster = new TempCluster();
+        foreach ($clusters as $index => $value) {
+            $dataTemp = [
+                'name_cluster' => ($index + 1) . ' cluster',
+                'nilai_sse' => $sse[$index],
+                'data_cluster' => []
+            ];
+            foreach ($value as $key => $data) {
+                $dataTemp['data_cluster']['C' . ($key + 1)] = count($data['data']);
+                $dataClusters['cluester ' . ($index + 1)]['C' . $key + 1] = count($data['data']);
+                $dataSSE['Cluster ' . $key + 1] = $sse[$key];
+            }
+            $tempCluster->create($dataTemp);
+        }
+
+        return ['clusters' => $dataClusters, 'SSE' => $dataSSE];
     }
 
     /**
@@ -387,6 +469,7 @@ class KmeansService
             Centroid::truncate();
             Normalization::truncate();
             WeightAlternatif::truncate();
+            TempCluster::truncate();
         }
     }
 }

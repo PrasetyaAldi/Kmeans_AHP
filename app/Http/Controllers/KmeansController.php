@@ -129,9 +129,6 @@ class KmeansController extends Controller
             $kmeansService->saveKmeans($value);
         }
 
-        // normalization data
-        $kmeansService->normalizationData();
-
         return redirect(route('k-means.index'))->with('success', 'Import Data Berhasil');
     }
 

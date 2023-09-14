@@ -322,14 +322,15 @@ class KmeansService
      */
     public function searchBestCluster(array $data, array $centroids, int $maxIterations = 100)
     {
-        $iterations = 0;
-        $clusters = [];
-        $sumSSE = [];
-        $sse = [];
-        $dataClusters = [];
-        $dataSSE = [];
-
+        $tempClusters = [];
+        $tempSSE = [];
         foreach ($centroids as $key => $centroid) {
+            $iterations = 0;
+            $clusters = [];
+            $sumSSE = [];
+            $sse = [];
+            $dataClusters = [];
+            $dataSSE = [];
             while ($iterations < $maxIterations) {
                 $clusters[$key] = [];
                 foreach ($data as $item) {
@@ -355,21 +356,21 @@ class KmeansService
                 }
                 $iterations++;
             }
-
-            $sse[$key] = $this->calculateSSE($sumSSE[$key]);
+            $tempClusters[$key] = $clusters[$key];
+            $tempSSE[$key] = $this->calculateSSE($sumSSE[$key]);
         }
 
         $tempCluster = new TempCluster();
-        foreach ($clusters as $index => $value) {
+        foreach ($tempClusters as $index => $value) {
             $dataTemp = [
                 'name_cluster' => ($index + 1) . ' cluster',
-                'nilai_sse' => $sse[$index],
+                'nilai_sse' => $tempSSE[$index],
                 'data_cluster' => []
             ];
             foreach ($value as $key => $data) {
                 $dataTemp['data_cluster']['C' . ($key + 1)] = count($data['data']);
                 $dataClusters['cluester ' . ($index + 1)]['C' . $key + 1] = count($data['data']);
-                $dataSSE['Cluster ' . $key + 1] = $sse[$key];
+                $dataSSE['Cluster ' . $key + 1] = $tempSSE[$key];
             }
             $tempCluster->create($dataTemp);
         }

@@ -141,6 +141,7 @@ class KmeansService
     public function getInitialCentroid(int $countCentroid = null, bool $isOptimization = true)
     {
         $normalize = new Normalization();
+        $normalize = $normalize->orderBy('kapasitas_produksi');
         $banyakData = $normalize->count();
         $cluster = $countCentroid ?? (int)sqrt($banyakData / 2);
 
@@ -149,14 +150,14 @@ class KmeansService
         if ($isOptimization) {
             for ($index = 1; $index <= $cluster; $index++) {
                 $tempCentroid = [];
-                $data = $normalize->inRandomOrder()->take($index)->get();
+                $data = $normalize->take($index)->get();
                 foreach ($data as $data) {
                     $tempCentroid[] = $data->getAttributes();
                 }
                 $centroids[] = $tempCentroid;
             }
         } else {
-            $data = $normalize->inRandomOrder()->take($countCentroid)->get();
+            $data = $normalize->take($countCentroid)->get();
             foreach ($data as $data) {
                 $centroids[] = $data->getAttributes();
             }
@@ -328,7 +329,6 @@ class KmeansService
             $iterations = 0;
             $clusters = [];
             $sumSSE = [];
-            $sse = [];
             $dataClusters = [];
             $dataSSE = [];
             while ($iterations < $maxIterations) {

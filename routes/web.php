@@ -39,6 +39,7 @@ Route::group(['middleware' => 'auth'], function () {
     Route::get('cluster', [KmeansController::class, 'cluster'])->name('cluster');
     Route::get('optimasi-cluster', [KmeansController::class, 'optimasiCluster'])->name('optimasi-cluster');
     Route::post('cluster', [KmeansController::class, 'processCluster'])->name('process');
+    Route::get('presentase', [KmeansController::class, 'presentaseCluster'])->name('presentase');
     Route::post('optimasi-cluster', [KmeansController::class, 'processOptimasiCluster'])->name('process-optimasi');
 
     Route::prefix('ahps')->as('ahps.')->group(function () {

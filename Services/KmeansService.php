@@ -253,8 +253,18 @@ class KmeansService
      */
     public function getCluster(int $paginate = 10)
     {
-        $cluster = Centroid::selectRaw('cluster, count(*) as jumlah, nilai_sse')->groupBy('cluster', 'nilai_sse')->orderBy('jumlah', 'desc');
-        return $cluster->paginate($paginate);
+        // select distinct cluster from centroid
+        $cluster = Centroid::distinct('cluster');
+        $data = [];
+        foreach ($cluster->get() as $item) {
+            $temp = [];
+            $dataCluster = Centroid::where('cluster', $item->cluster)->get();
+            foreach ($dataCluster as $dc) {
+                $temp[] = $dc->data->toArray();
+            }
+            $data[$item->cluster] = $temp;
+        }
+        return $data;
     }
 
     public function getTempCluster()
@@ -472,5 +482,30 @@ class KmeansService
             WeightAlternatif::truncate();
             TempCluster::truncate();
         }
+    }
+
+    /**
+     * menghitung presentase masing-masing cluster
+     * 
+     */
+    public function calculatePercentageCluster()
+    {
+        // menghitung presentase masing-masing cluster dan masing-masing column dari normalize
+        $cluster = Centroid::distinct('cluster');
+        $data = [];
+        foreach ($cluster->get() as $item) {
+            $tempPrecentage = [];
+            $dataCluster = Centroid::where('cluster', $item->cluster)->get();
+            $normalize = Normalization::whereIn('id', $dataCluster->pluck('normalize_id'))->get();
+            // menghitung presentase masing-masing column
+            foreach ($normalize->first()->getAttributes() as $key => $value) {
+                if (in_array($key, $this->columnToNormalize)) {
+                    $tempPrecentage[$key] = $normalize->sum($key) / $normalize->count() * 100;
+                }
+            }
+            $data[$item->cluster] = $tempPrecentage;
+        }
+
+        return $data;
     }
 }

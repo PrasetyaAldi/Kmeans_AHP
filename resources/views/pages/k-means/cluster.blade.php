@@ -3,64 +3,40 @@
 @section('title', 'Cluster')
 
 @section('content')
-    @php
-        $label = $data->pluck('name_cluster')->toArray();
-        $sse = $data->pluck('nilai_sse')->toArray();
-    @endphp
-    <div class="card" style="border: 1px solid #eef2f5">
-        <div class="card-header">
-            <div class="d-flex justify-content-between">
-                <h3 class="card-title">Cluster</h3>
-                <button type="button" data-bs-toggle="modal" data-bs-target="#optimasi_cluster" class="btn btn-success">
-                    <i class="fa-sharp fa-solid fa-gear"></i> Process Cluster
-                </button>
-            </div>
-        </div>
-        <div class="card-body">
-            <table class="table table-striped">
-                <thead>
-                    <tr>
-                        <th>Nama Cluster</th>
-                        <th>Jumlah</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    @forelse ($data as $item)
-                        <tr>
-                            <td>{{ $item->cluster }}</td>
-                            <td>{{ $item->jumlah }}</td>
-                        </tr>
-                    @empty
-                        <tr>
-                            <td colspan="2" class="text-center">Data Tidak ditemukan</td>
-                        </tr>
-                    @endforelse
-                    @if (!empty($data->items()))
-                        <tr>
-                            <th>Total</th>
-                            <th>{{ array_reduce(
-                                $data->items(),
-                                function ($carry, $item) {
-                                    return $carry + $item->jumlah;
-                                },
-                                0,
-                            ) }}
-                            </th>
-                        </tr>
-                        <tr>
-                            <th>Nilai SSE</th>
-                            <th>{{ $data->first()->nilai_sse }}</th>
-                        </tr>
-                    @endif
-                </tbody>
-            </table>
-        </div>
-        @if ($data->hasPages())
-            <div class="card-footer bg-white">
-                {{ $data->links() }}
-            </div>
-        @endif
+    <div class="d-flex justify-content-between mb-3">
+        <h3 class="card-title">Halaman Cluster</h3>
+        <button type="button" data-bs-toggle="modal" data-bs-target="#optimasi_cluster" class="btn btn-success">
+            <i class="fa-sharp fa-solid fa-gear"></i> Process Cluster
+        </button>
     </div>
+    @foreach ($data as $key => $item)
+        <div class="card mb-3" style="border: 1px solid #eef2f5">
+            <div class="card-header">
+                {{-- <div ></div> --}}
+                <h3 class="card-title">Cluster {{ $key }}</h3>
+            </div>
+            <div class="card-body">
+                <table class="table table-bordered">
+                    <thead>
+                        <tr>
+                            @foreach ($columns as $column)
+                                <th>{{ $column }}</th>
+                            @endforeach
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach ($item as $row)
+                            <tr>
+                                @foreach ($columns as $column)
+                                    <td>{{ $row[str_replace(' ', '_', strtolower($column))] }}</td>
+                                @endforeach
+                            </tr>
+                        @endforeach
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    @endforeach
 @endsection
 
 @section('modal')

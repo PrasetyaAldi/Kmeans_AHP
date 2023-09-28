@@ -103,6 +103,7 @@ class KmeansController extends Controller
     public function cluster(KmeansService $kmeansService)
     {
         $data['data'] = $kmeansService->getCluster();
+        $data['columns'] = $this->columns;
         return view('pages.k-means.cluster', $data);
     }
 
@@ -146,7 +147,6 @@ class KmeansController extends Controller
         // process
         $kmeansService->searchBestCluster($normalizations, $centroids);
 
-        // $data = $kmeansService->processKmeans($normalizations, $centroids);
         return redirect()->to(route('optimasi-cluster'))->with('success', 'Berhasil menghitung optimasi cluster');
     }
 
@@ -166,5 +166,19 @@ class KmeansController extends Controller
         $kmeansService->processKmeans($normalizations, $centroids);
 
         return redirect()->to(route('cluster'))->with('success', $message);
+    }
+
+    /**
+     * presentase dari cluster
+     */
+    public function presentaseCluster(KmeansService $kmeansService)
+    {
+        $data['data'] = $kmeansService->calculatePercentageCluster();
+        // replace nama_pemilik from $this->column
+        $data['columns'] = array_filter($this->columns, function ($item) {
+            return $item !== 'Nama Pemilik';
+        });
+
+        return view('pages.k-means.presentase', $data);
     }
 }

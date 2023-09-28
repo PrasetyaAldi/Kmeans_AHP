@@ -16,7 +16,7 @@
                     <li class="nav-item"><a class="nav-link{{ request()->is('home') ? ' active fw-semibold' : '' }}"
                             href="{{ route('home.index') }}"><i class="fa-solid fa-house"></i> Home</a></li>
                     <li class="nav-item dropdown">
-                        <a class="nav-link dropdown-toggle{{ request()->is('k-means') || request()->is('cluster') || request()->is('k-means/*') || request()->is('optimasi-cluster') ? ' active fw-semibold' : '' }}"
+                        <a class="nav-link dropdown-toggle{{ request()->is('k-means') || request()->is('cluster') || request()->is('k-means/*') || request()->is('optimasi-cluster') || request()->is('presentase') ? ' active fw-semibold' : '' }}"
                             href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
                             <i class="fa-solid fa-database"></i> Data
                         </a>
@@ -31,6 +31,8 @@
                                     href="{{ route('optimasi-cluster') }}">Optimasi Cluster</a></li>
                             <li><a class="dropdown-item {{ request()->is('cluster') ? ' active' : '' }}"
                                     href="{{ route('cluster') }}">Cluster</a></li>
+                            <li><a class="dropdown-item {{ request()->is('presentase') ? ' active' : '' }}"
+                                    href="{{ route('presentase') }}">Presentase Cluster</a></li>
                         </ul>
                     </li>
                     <li class="nav-item dropdown">

@@ -31,6 +31,6 @@ class Centroid extends Model
      */
     public function data(): \Illuminate\Database\Eloquent\Relations\BelongsTo
     {
-        return $this->belongsTo(KmeansData::class, 'normalize_id', 'id');
+        return $this->belongsTo(KmeansDataReal::class, 'normalize_id', 'id');
     }
 }

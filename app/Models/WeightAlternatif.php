@@ -14,7 +14,8 @@ class WeightAlternatif extends Model
     protected $fillable = [
         'normalize_id',
         'criteria_id',
-        'eigen_value'
+        'eigen_value',
+        'cr'
     ];
 
     /**

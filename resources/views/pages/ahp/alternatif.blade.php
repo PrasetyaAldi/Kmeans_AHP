@@ -36,6 +36,9 @@
                 </div>
                 <div class="card-body">
                     @if (!empty($alternatif_weight->items()))
+                        <div class="alert alert-primary" role="alert">
+                            Nilai CR nya : {{ $alternatif_weight->first()->cr }}
+                        </div>
                         <table class="table">
                             <thead>
                                 <tr>
@@ -69,40 +72,6 @@
                                             @endforeach
                                         </tr>
                                     </thead>
-                                    {{-- <tbody>
-                                    <form action="{{ route('ahps.store-weight-alternatif') }}" method="post"
-                                        class="formWeightAlternatif">
-                                        @csrf
-                                        <input type="hidden" name="criteria_id" value="{{ $active }}">
-                                        <input type="hidden" name="cluster" value="{{ $select_cluster }}">
-                                        @foreach ($data as $key => $item)
-                                            <tr>
-                                                <th class="headcol">{{ $item->data->nama_pemilik }}</th>
-                                                @foreach ($data as $key2 => $item2)
-                                                    <td>
-                                                        @if ($key == $key2)
-                                                            <input type="number" class="form-control"
-                                                                name="data[{{ $key }}][{{ $key2 }}]"
-                                                                id="data[{{ $key }}][{{ $key2 }}]"
-                                                                data-col="{{ $key2 }}"
-                                                                data-row="{{ $key }}"
-                                                                value="{{ old('data[' . $key . '][' . $key2 . ']') ?? 1 }}"
-                                                                min="1" max="9" readonly
-                                                                style="background-color: gray">
-                                                        @else
-                                                            <input type="number" class="form-control"
-                                                                name="data[{{ $key }}][{{ $key2 }}]"
-                                                                id="data[{{ $key }}][{{ $key2 }}]"
-                                                                data-col="{{ $key2 }}"
-                                                                data-row="{{ $key }}"
-                                                                value="{{ old('data[' . $key . '][' . $key2 . ']') ?? 1 }}">
-                                                        @endif
-                                                    </td>
-                                                @endforeach
-                                            </tr>
-                                        @endforeach
-                                    </form>
-                                </tbody> --}}
                                     <tbody id="dynamic-tbody">
                                         <!-- Tampilkan spinner saat proses render data belum selesai -->
                                         <tr>

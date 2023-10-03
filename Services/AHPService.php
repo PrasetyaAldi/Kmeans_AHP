@@ -88,7 +88,7 @@ class AHPService
         }
 
         // menyimpan ke table bobot_criteria
-        $this->saveCriteriaWeight($criteria, $weights, $eigenValue);
+        $this->saveCriteriaWeight($criteria, $weights, $eigenValue, $cr);
 
         return ['consistency_index' => $ci, 'consistency_ratio' => $cr, 'weights' => $weights];
     }
@@ -101,7 +101,7 @@ class AHPService
      * @param array $eigenValue
      * 
      */
-    public function saveCriteriaWeight($criteria, $weights, $eigenValue): void
+    public function saveCriteriaWeight($criteria, $weights, $eigenValue, $cr): void
     {
         $weightCriteria = new WeightCriteria;
 
@@ -110,6 +110,7 @@ class AHPService
                 'criteria_id' => $value['id'],
                 'eigen_value' => $eigenValue[$key],
                 'bobot' => $weights[$key],
+                'cr' => $cr ?? 0,
             ]);
         }
     }
@@ -170,6 +171,20 @@ class AHPService
      */
     public function getAlternatifWeight(array $alternatif, int $criteriaId = 1, string $cluster = 'C3'): array
     {
+        // random index
+        $randomIndex = [
+            1 => 0,
+            2 => 0,
+            3 => 0.58,
+            4 => 0.9,
+            5 => 1.12,
+            6 => 1.24,
+            7 => 1.32,
+            8 => 1.41,
+            9 => 1.45,
+            10 => 1.49
+        ];
+
         // count all alternatif in column
         $sum = [];
         foreach ($alternatif as $key => $value) {
@@ -197,15 +212,46 @@ class AHPService
             $rowAverages[] = array_sum($evaluationNormalized) / count($evaluationNormalized);
         }
 
+        // // menghitung bobot alternatif
+        $totalRowAverage = array_sum($rowAverages);
+        $weights = [];
+        foreach ($rowAverages as $average) {
+            $weight = $average / $totalRowAverage;
+            $weights[] = $weight;
+        }
+
+        // // menghitung eigen value
+        $eigenValue = [];
+        foreach ($weights as $key => $weight) {
+            $eigenValue[] = $weight * $sum[$key];
+        }
+
+        $ci = (array_sum($eigenValue) - count($alternatif)) / (count($alternatif) - 1);
+
+        $total_criteria = self::getCriteria()->count();
+
+        // hanya jika alternatif lebih besar dari random index maka hitung nilai ci_expected
+        if (count($alternatif) > count($randomIndex)) {
+            $ci_expected = (count($alternatif) - 1) / (count($alternatif) - $total_criteria);
+            $cr = $ci / $ci_expected;
+        } else {
+            $cr = $ci / $randomIndex[count($alternatif)];
+        }
+
+        // hanya jika nilai CR > 1
+        if ($cr > 1) {
+            throw new Exception('Nilai CR > 1');
+        }
+
         // simpan ke database
-        $this->saveAlternatifWeight($alternatif, $rowAverages, $cluster, $criteriaId);
+        $this->saveAlternatifWeight($alternatif, $rowAverages, $cr, $cluster, $criteriaId,);
         return ['eigen_value' => $rowAverages];
     }
 
     /**
      * menyimpan ke table nilai_alternatif
      */
-    public function saveAlternatifWeight(array $alternatif,  array $eigenValue, string $cluster = 'C3', int $criteriaId = 1): void
+    public function saveAlternatifWeight(array $alternatif,  array $eigenValue, float $cr, string $cluster = 'C3', int $criteriaId = 1): void
     {
         // get alternatif data from cluster
         $alternatives = Centroid::where('cluster', $cluster)->pluck('normalize_id')->toArray();
@@ -228,6 +274,7 @@ class AHPService
                 'normalize_id' => $key,
                 'criteria_id' => $criteriaId,
                 'eigen_value' => $value['eigen_value'],
+                'cr' => $cr ?? '0',
             ]);
         }
     }
@@ -237,7 +284,7 @@ class AHPService
      */
     public function getAllWeightCriteria()
     {
-        return WeightCriteria::with('criteria')->get();
+        return WeightCriteria::with('criteria')->orderBy('eigen_value', 'desc')->get();
     }
 
     /**
@@ -247,7 +294,7 @@ class AHPService
     {
         $centroids = Centroid::where('cluster', $cluster)->pluck('normalize_id')->toArray();
 
-        return WeightAlternatif::with(['data', 'criteria'])->where('criteria_id', $criteriaId)->whereIn('normalize_id', $centroids)->paginate(10);
+        return WeightAlternatif::with(['data', 'criteria'])->where('criteria_id', $criteriaId)->whereIn('normalize_id', $centroids)->orderBy('eigen_value', 'desc')->paginate(10);
     }
 
     /**

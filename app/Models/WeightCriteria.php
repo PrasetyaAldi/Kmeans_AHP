@@ -15,6 +15,7 @@ class WeightCriteria extends Model
         'criteria_id',
         'eigen_value',
         'bobot',
+        'cr',
         'created_at',
         'updated_at',
     ];

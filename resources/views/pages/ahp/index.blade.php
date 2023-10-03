@@ -15,17 +15,20 @@
         <div class="card-header">
             <div class="d-flex justify-content-between">
                 <h3 class="card-title">Bobot Kriteria</h3>
-                @if (!empty($weight_criteria->toArray()))
+                {{-- @if (!empty($weight_criteria->toArray()))
                     <form action="{{ route('ahps.reset') }}" method="POST">
                         @csrf
                         <button class="btn btn-warning" style="background-color: var(--bs-warning-bg-subtle)"
                             type="submit"><i class="fa-solid fa-gear"></i> Hitung Ulang</button>
                     </form>
-                @endif
+                @endif --}}
             </div>
         </div>
         <div class="card-body">
             @if (!empty($weight_criteria->toArray()))
+                <div class="alert alert-primary" role="alert">
+                    Nilai CR : {{ $weight_criteria->first()->cr }}
+                </div>
                 {{-- <img class="img-fluid mx-auto rounded d-block" style="width: 30%" src="{{ asset('assets/img/done.png') }}"
                     alt="done.png">
                 <h4 class="card-title text-center">Bobot Kriteria sudah di hitung</h4> --}}

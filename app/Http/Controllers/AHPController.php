@@ -181,4 +181,14 @@ class AHPController extends Controller
         $data = $ahpService->getAlternatif($cluster);
         return response()->json($data);
     }
+
+    /**
+     * get data criteria
+     * 
+     */
+    public function getDataCriteria(Request $request, AHPService $ahpService)
+    {
+        $data = $ahpService->pairwiseComparisonCriteria();
+        return response()->json($data);
+    }
 }

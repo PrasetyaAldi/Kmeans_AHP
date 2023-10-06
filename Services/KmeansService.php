@@ -517,6 +517,9 @@ class KmeansService
             $data[$item->cluster] = $tempPrecentage;
         }
 
+        // sorting by key
+        ksort($data, SORT_NATURAL);
+
         return $data;
     }
 }

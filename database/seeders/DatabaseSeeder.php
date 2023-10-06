@@ -15,7 +15,6 @@ class DatabaseSeeder extends Seeder
         $this->call([
             AuthSeeder::class,
             CriteriaSeeder::class,
-            WeightCriteriaSeeder::class,
         ]);
     }
 }

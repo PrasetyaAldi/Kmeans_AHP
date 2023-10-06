@@ -119,11 +119,13 @@
         document.addEventListener('DOMContentLoaded', function() {
             // hanya jika alternatif weight empty
             @if (empty($alternatif_weight->items()))
-                fetch(`{{ route('ahps.data-alternatif') }}?cluster={{ $select_cluster }}`).then(res => res.json())
-                    .then(res => {
+                const xhr = new XMLHttpRequest();
+                xhr.open('GET', `{{ route('ahps.data-alternatif') }}?cluster={{ $select_cluster }}`)
+                xhr.onload = function() {
+                    if (xhr.status === 200) {
+                        const data = JSON.parse(xhr.responseText)
                         const clusterId = document.querySelector('select[name="cluster"]').value
                         const tbody = document.getElementById('dynamic-tbody')
-                        const data = res;
                         tbody.innerHTML = ''
 
                         data.forEach((item, key) => {
@@ -167,7 +169,11 @@
                                 input2.value = 1 / item.value
                             }
                         })
-                    }).catch(err => console.log(err))
+                    } else {
+                        console.error('Request failed.  Returned status of ' + xhr.status)
+                    }
+                }
+                xhr.send()
             @endif
         })
 

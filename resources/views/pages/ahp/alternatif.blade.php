@@ -23,10 +23,9 @@
                             <form class="formCluster">
                                 <select name="cluster" class="form-control">
                                     @foreach ($clusters as $cluster)
-                                        <option value="{{ $cluster->cluster }}"
-                                            {{ $cluster->cluster == $select_cluster ? 'selected' : '' }}
-                                            onclick="console.log('test')">
-                                            {{ $cluster->cluster }}
+                                        <option value="{{ $cluster['cluster'] }}"
+                                            {{ $cluster['cluster'] == $select_cluster ? 'selected' : '' }}>
+                                            {{ $cluster['cluster'] }}
                                         </option>
                                     @endforeach
                                 </select>

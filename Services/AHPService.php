@@ -330,14 +330,25 @@ class AHPService
             $finalResult[] = array_sum($value);
         }
 
-        // sorting nilai akhir php dari yang terbesar
-        arsort($finalResult);
-
         // menghitung peringkat alternatif
         $rank = [];
         foreach ($finalResult as $key => $value) {
+            $id = $centroids[$key];
             // tambahkan peringkat
-            $rank[] = ['id' => $centroids[$key], 'rank' => $value, 'nama' => Centroid::find($centroids[$key])->data->nama_pemilik, 'ranked' => $key + 1];
+            $rank[] = [
+                'id' => $id,
+                'rank' => $value,
+                'nama' => Centroid::find($id)->data->nama_pemilik,
+            ];
+        }
+
+        // sorting
+        usort($rank, function ($a, $b) {
+            return $b['rank'] <=> $a['rank'];
+        });
+
+        foreach ($rank as $key => $value) {
+            $rank[$key]['ranked'] = $key + 1;
         }
 
         // return

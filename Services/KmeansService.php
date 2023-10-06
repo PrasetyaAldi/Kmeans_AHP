@@ -462,7 +462,18 @@ class KmeansService
      */
     public function getClusterName()
     {
-        return Centroid::selectRaw('cluster, COUNT(1) as jumlah ')->groupBy('cluster')->orderBy('cluster')->get();
+        $cluster =  Centroid::selectRaw('cluster, COUNT(1) as jumlah ')->groupBy('cluster')->get()->toArray();
+
+        // sorting cluster berdasarkan cluster
+        usort($cluster, function ($a, $b) {
+            $pattern = '/[0-9]+/';
+            preg_match($pattern, $a['cluster'], $a);
+            preg_match($pattern, $b['cluster'], $b);
+
+            return $a[0] <=> $b[0];
+        });
+
+        return $cluster;
     }
 
     /**

@@ -438,7 +438,7 @@ class KmeansService
             $columnMapping = [];
 
             foreach ($values as $index => $value) {
-                $columnMapping[$value] = $index + 1;
+                $columnMapping[$value] = $index;
             }
             $mapping[$column] = $columnMapping;
         }

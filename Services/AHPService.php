@@ -315,6 +315,8 @@ class AHPService
             return [];
         }
 
+        // set limit time out unlimited
+        set_time_limit(0);
         // menghitung nilai akhir
         $result = [];
         foreach ($centroids as $centroid) {

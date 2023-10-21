@@ -256,6 +256,9 @@ class KmeansService
         // select distinct cluster from centroid
         $cluster = Centroid::distinct('cluster');
         $data = [];
+        if ($cluster->count() == 0) {
+            return $data;
+        }
         foreach ($cluster->get() as $item) {
             $temp = [];
             $dataCluster = Centroid::where('cluster', $item->cluster)->get();
@@ -508,10 +511,13 @@ class KmeansService
             $tempPrecentage = [];
             $dataCluster = Centroid::where('cluster', $item->cluster)->get();
             $normalize = Normalization::whereIn('id', $dataCluster->pluck('normalize_id'))->get();
+            $allNormalize = Normalization::all();
             // menghitung presentase masing-masing column
             foreach ($normalize->first()->getAttributes() as $key => $value) {
                 if (in_array($key, $this->columnToNormalize)) {
-                    $tempPrecentage[$key] = $normalize->sum($key) / $normalize->count() * 100;
+                    // $tempPrecentage[$key] = $normalize->sum($key) / $normalize->count() * 100;
+                    // menghitung presentase masing-masing cluster dan semua data
+                    $tempPrecentage[$key] = $normalize->sum($key) / $allNormalize->sum($key) * 100;
                 }
             }
             $data[$item->cluster] = $tempPrecentage;

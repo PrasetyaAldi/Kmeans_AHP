@@ -4,6 +4,7 @@ namespace Services;
 
 use App\Models\Centroid;
 use App\Models\Criteria;
+use App\Models\KmeansData;
 use App\Models\WeightAlternatif;
 use App\Models\WeightCriteria;
 use Exception;
@@ -306,12 +307,12 @@ class AHPService
      */
     public function finalResult(string $cluster)
     {
-        $criteria = $this->getAllWeightCriteria();
+        $criteria = WeightCriteria::with('criteria')->get();
         $centroids = Centroid::where('cluster', $cluster)->pluck('normalize_id')->toArray();
-        $alternatif = WeightAlternatif::whereIn('normalize_id', $centroids)->get();
+        $kMeansData = KmeansData::whereIn('id', $centroids)->get();
 
-        // hanya jika alternatif null
-        if ($alternatif->isEmpty()) {
+        // hanya jika kMeansData null
+        if ($kMeansData->isEmpty()) {
             return [];
         }
 
@@ -322,7 +323,7 @@ class AHPService
         foreach ($centroids as $centroid) {
             $row = [];
             foreach ($criteria as $c) {
-                $row[] = $alternatif->where('normalize_id', $centroid)->where('criteria_id', $c->criteria_id)->first()?->eigen_value * $c->bobot;
+                $row[] = $kMeansData->where('id', $centroid)->pluck($c->criteria->name)->first() * $c->bobot;
             }
             $result[] = $row;
         }
@@ -332,7 +333,7 @@ class AHPService
             $finalResult[] = array_sum($value);
         }
 
-        // menghitung peringkat alternatif
+        // menghitung peringkat kMeansData
         $rank = [];
         foreach ($finalResult as $key => $value) {
             $id = $centroids[$key];

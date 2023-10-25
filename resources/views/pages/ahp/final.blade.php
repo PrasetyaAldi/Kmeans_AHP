@@ -31,7 +31,7 @@
                             <thead>
                                 <tr>
                                     <th>Peringkat</th>
-                                    <th>Nama Pemilik</th>
+                                    <th>Nama UMKM</th>
                                     <th>Nilai AHP</th>
                                 </tr>
                             </thead>

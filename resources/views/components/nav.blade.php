@@ -43,9 +43,6 @@
                         <ul class="dropdown-menu">
                             <li><a class="dropdown-item{{ request()->is('ahps') ? ' active' : '' }}"
                                     href="{{ route('ahps.index') }}">Bobot Kriteria</a></li>
-                            <li><a class="dropdown-item{{ request()->is('ahps/weight-alternatif') ? ' active' : '' }}"
-                                    href="{{ route('ahps.weight-alternatif') }}">Bobot Alternatif</a>
-                            </li>
                             <li><a class="dropdown-item{{ request()->is('ahps/final-calculate') ? ' active' : '' }}"
                                     href="{{ route('ahps.final-calculate') }}">Peringkat</a>
                             </li>

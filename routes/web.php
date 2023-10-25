@@ -43,12 +43,12 @@ Route::group(['middleware' => 'auth'], function () {
     Route::post('optimasi-cluster', [KmeansController::class, 'processOptimasiCluster'])->name('process-optimasi');
 
     Route::prefix('ahps')->as('ahps.')->group(function () {
-        Route::get('weight-alternatif', [AHPController::class, 'weightAlternatif'])->name('weight-alternatif');
+        // Route::get('weight-alternatif', [AHPController::class, 'weightAlternatif'])->name('weight-alternatif');
         Route::get('final-calculate', [AHPController::class, 'finalCalculate'])->name('final-calculate');
         Route::post('reset', [AHPController::class, 'resetWeightCriteria'])->name('reset');
-        Route::post('reset-alternatif', [AHPController::class, 'resetWeightAlternatif'])->name('reset-weight-alternatif');
-        Route::post('store-weight-alternatif', [AHPController::class, 'storeWeightAlternatif'])->name('store-weight-alternatif');
-        Route::get('data-alternatif', [AHPController::class, 'getDataAlternatif'])->name('data-alternatif');
+        // Route::post('reset-alternatif', [AHPController::class, 'resetWeightAlternatif'])->name('reset-weight-alternatif');
+        // Route::post('store-weight-alternatif', [AHPController::class, 'storeWeightAlternatif'])->name('store-weight-alternatif');
+        // Route::get('data-alternatif', [AHPController::class, 'getDataAlternatif'])->name('data-alternatif');
         Route::get('data-criteria', [AHPController::class, 'getDataCriteria'])->name('data-criteria');
     });
     Route::resource('ahps', AHPController::class);

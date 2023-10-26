@@ -15,6 +15,18 @@ class AHPController extends Controller
     {
         $data['data'] = $ahpService->pairwiseComparisonCriteria();
         $data['weight_criteria'] = $ahpService->getAllWeightCriteria();
+        $data['input'] = [
+            [1, 8, 3, 2, 1, 3, 5, 1, 1, 1],
+            [0.125, 1, 7, 1, 2, 8, 5, 8, 7, 6],
+            [0.333, 0.143, 1, 1, 7, 9, 1, 9, 7, 3],
+            [0.5, 1, 1, 1, 5, 8, 4, 3, 8, 2],
+            [1, 0.5, 0.143, 0.2, 1, 5, 7, 7, 6, 9],
+            [0.333, 0.125, 0.111, 0.125, 0.2, 1, 8, 9, 1, 3],
+            [0.2, 0.2, 1, 0.25, 0.143, 0.125, 1, 9, 2, 3],
+            [1, 0.125, 0.111, 0.333, 0.143, 0.111, 0.111, 1, 7, 3],
+            [1, 0.143, 0.143, 0.125, 0.166, 1, 0.5, 0.143, 1, 2],
+            [1, 0.166, 0.333, 0.5, 0.111, 0.333, 0.333, 0.333, 0.5, 1]
+        ];
         return view('pages.ahp.index', $data);
     }
 
@@ -61,7 +73,6 @@ class AHPController extends Controller
      */
     public function weightAlternatif(Request $request, AHPService $ahpService)
     {
-        // dd($request->all());
         $criteria = $request->criteria ?? '1';
         $cluster = $request->cluster ?? 'C1';
         $kMeansService = new KmeansService;
@@ -188,7 +199,19 @@ class AHPController extends Controller
      */
     public function getDataCriteria(Request $request, AHPService $ahpService)
     {
-        $data = $ahpService->pairwiseComparisonCriteria();
+        $data['data'] = $ahpService->pairwiseComparisonCriteria();
+        $data['input'] = [
+            [1, 8, 3, 2, 1, 3, 5, 1, 1, 1],
+            [0.125, 1, 7, 1, 2, 8, 5, 8, 7, 6],
+            [0.333, 0.143, 1, 1, 7, 9, 1, 9, 7, 3],
+            [0.5, 1, 1, 1, 5, 8, 4, 3, 8, 2],
+            [1, 0.5, 0.143, 0.2, 1, 5, 7, 7, 6, 9],
+            [0.333, 0.125, 0.111, 0, 125, 0.2, 1, 8, 9, 1, 3],
+            [0.2, 0.2, 1, 0.25, 0.143, 0.125, 1, 9, 2, 3],
+            [1, 0.125, 0.111, 0.333, 0.143, 0.111, 0.111, 1, 7, 3],
+            [1, 0.143, 0.143, 0.125, 0.166, 1, 0.5, 0.143, 1, 2],
+            [1, 0.166, 0.333, 0.5, 0.111, 0.333, 0.333, 0.333, 0.5, 1]
+        ];
         return response()->json($data);
     }
 }

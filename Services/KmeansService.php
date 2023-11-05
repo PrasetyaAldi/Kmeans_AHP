@@ -16,15 +16,10 @@ class KmeansService
 {
     protected $columnToNormalize = [
         'jumlah_pekerja',
-        'jenis_produksi',
         'kapasitas_produksi',
-        'harga_satuan',
         'nilai_produksi',
         'nilai_investasi',
-        'umur',
-        'pendidikan',
         'surat_izin',
-        'motif',
     ];
 
     /**
@@ -432,7 +427,7 @@ class KmeansService
     public function procesLabelEncoding()
     {
         $kmeansData = new KmeansDataReal();
-        $columns = ['jenis_produksi', 'pendidikan', 'surat_izin', 'motif'];
+        $columns = ['surat_izin'];
         $mapping = [];
 
         // labeling

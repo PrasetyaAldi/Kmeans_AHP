@@ -13,15 +13,10 @@ class KmeansController extends Controller
     protected $columns = [
         'Nama Pemilik',
         'Jumlah Pekerja',
-        'Jenis Produksi',
         'Kapasitas Produksi',
-        'Harga Satuan',
         'Nilai Produksi',
         'Nilai Investasi',
-        'Umur',
-        'Pendidikan',
         'Surat Izin',
-        'Motif',
     ];
     /**
      * Display a listing of the resource.

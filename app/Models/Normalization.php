@@ -14,15 +14,10 @@ class Normalization extends Model
     protected $fillable = [
         'data-id',
         'jumlah_pekerja',
-        'jenis_produksi',
         'kapasitas_produksi',
-        'harga_satuan',
         'nilai_produksi',
         'nilai_investasi',
-        'umur',
-        'pendidikan',
         'surat_izin',
-        'motif',
     ];
 
     /**
